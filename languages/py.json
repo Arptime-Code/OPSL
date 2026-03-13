@@ -1,0 +1,5 @@
+{
+    "tag" : "py",
+    "cmd" : "python",
+    "runner" : "path"
+}
