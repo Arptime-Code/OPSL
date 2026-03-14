@@ -1,5 +1,5 @@
 {
     "tag" : "c",
     "cmd" : "gcc",
-    "runner" : "path"
+    "runner" : "runners/c-runner"
 }
