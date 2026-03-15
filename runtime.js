@@ -25,7 +25,8 @@ const lines = source.split("\n");
 
 
 const instructions = parser.parse(lines);
-executor.execute(instructions);
+console.log(instructions);
+// executor.execute(instructions);
 
 
 

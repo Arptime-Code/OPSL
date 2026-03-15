@@ -34,14 +34,16 @@ function parse(lines)
             // Parse body until }
             const bodyLines = [];
             const startLine = i;
+            i += 2;
 
-            while (j < lines.length) {
+            while (i < lines.length) {
                 const bodyLine = lines[i].trim();
                 if (bodyLine === "}") break;
-                if (bodyLine && !bodyLine.startsWith("//")) body.push(bodyLine);
-                j++;
+                if (bodyLine && !bodyLine.startsWith("//")) bodyLines.push(bodyLine);
+                i++;
             }
             instructions.push({ type:"DEFINE", name: functionName, params, body: bodyLines, line: startLine });
+            continue;
         }
         if(line.startsWith("IMPORT "))
         {
@@ -97,13 +99,6 @@ function parse(lines)
     }
 
 
-
-
-    //Tokenizer
-
-
-
-
     return instructions;
 }
 
@@ -149,7 +144,7 @@ function tokenizeArgs(raw)
     }
     if((squareBraces === 0 && curlyBraces === 0 && doubleQuote === false))
     {
-        tokens.push(raw.substring(lastStringCut, i + 1));
+        tokens.push(raw.substring(lastStringCut, raw.length));
     }
     return tokens
 }
@@ -168,13 +163,17 @@ function splitFunction(line)
 
 function trimLines(lines)
 {
+    let newLines = [];
     for(let i = 0; i < lines.length; i++) {
         const line = lines[i].trim(); // <-- trim FIRST, every time
 
+
         if(!line || line.startsWith("//")) { continue; }
-        // now match patterns against `line`
+        
+        newLines.push(line);
     }
-    return lines;
+    console.log(newLines);
+    return newLines;
 }
 
 

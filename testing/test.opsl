@@ -1,0 +1,23 @@
+//Work well
+IMPORT [py] hello
+IMPORT [opsl] anotherLib
+IMPORT [js] csvsimple
+
+
+//I dont know if it works well
+DEFINE helloWorld()
+{
+    //inividual calls in function not working because they only count into body of function and dont get actual calls like normal ouside of function calls - is that wanted???
+    hello.aFunction(param1,param2)
+    hello.aFunction2(param1)
+
+    //Return not working not getting detected because of tab before return keyword becasue returns are always IN function boies
+    return hello
+}
+
+//Works well
+hello = helloWorld()
+helloWorld()
+
+anotherHello = anotherLib.something(param1,param2)
+csvsimple.csv(file)
