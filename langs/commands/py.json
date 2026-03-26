@@ -1,0 +1,6 @@
+{
+    "command": "python3",
+    "parameters": ["-i"],
+    "getVariableCommand" : "print(\"__OPSL__\")\n",
+    "identifier" : "__OPSL__"
+}

@@ -1,23 +1,24 @@
-//Work well
-IMPORT [py] hello
-IMPORT [opsl] anotherLib
-IMPORT [js] csvsimple
+// Import external libraries
+IMPORT [py] console
+IMPORT [js] math
 
 
-//I dont know if it works well
-DEFINE helloWorld()
-{
-    //inividual calls in function not working because they only count into body of function and dont get actual calls like normal ouside of function calls - is that wanted???
-    hello.aFunction(param1,param2)
-    hello.aFunction2(param1)
 
-    //Return not working not getting detected because of tab before return keyword becasue returns are always IN function boies
-    return hello
-}
+// Define string variables
+VARIABLE testlib.message = "Trade executed successfully"
+VARIABLE testlib.errorMsg = "Insufficient balance"
 
-//Works well
-hello = helloWorld()
-helloWorld()
+// Define custom function
+DEFINE calculateProfit
+  ASSIGN temp.profit = testlib.price
+  CALL math.max
+  VARIABLE result = "Profit: "
+  CALL console.log
+END
 
-anotherHello = anotherLib.something(param1,param2)
-csvsimple.csv(file)
+// Call functions
+CALL console.log
+CALL testlib.calculateProfit
+
+
+CALL testlib.validateTrade

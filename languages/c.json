@@ -1,5 +1,0 @@
-{
-    "tag" : "c",
-    "cmd" : "gcc",
-    "runner" : "runners/c-runner"
-}
