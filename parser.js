@@ -1,19 +1,112 @@
-function parse(codeString, libraryName)
+// function parse(codeString, libraryName)
+// {
+//     let instructions = [];
+
+
+//     let lines = intoLines(codeString);
+
+//     lines = cleanCode(lines);
+
+
+//     for(let i = 0; i < lines.length; i++)
+//     {
+//         let line = lines[i];
+
+//         if(line.startsWith("IMPORT "))
+//         {
+//             let replacedLine = line.replaceAll(" ", "|").replaceAll("[", "|").replaceAll("]", "|");
+//             let splitLine = replacedLine.split("|");
+
+//             let lang = splitLine[2];
+//             let library = splitLine[4];
+
+
+//             instructions.push({"type" : "IMPORT", "lang" : lang, "library" : library});
+//         }
+//         if(line.startsWith("ASSIGN "))
+//         {
+//             let replacedLine = line.replaceAll(" = ", "|").replaceAll(".", "|").replaceAll(" ", "|");
+//             let splitLine = replacedLine.split("|");
+
+//             let library = splitLine[1];
+//             let name = splitLine[2];
+//             let libraryValue = splitLine[3];
+//             let variableValue = splitLine[4];
+
+
+//             instructions.push({"type" : "ASSIGN", "library" : library, "name" : name, "libraryValue" : libraryValue, "variableValue" : variableValue});
+//         }
+//         if(line.startsWith("VARIABLE "))
+//         {
+//             //maybe first replace All """" and get the string from that
+//             //then everything else
+//             let replacedLineString = line.replaceAll('"', "|");
+//             let splitLineString = replacedLineString.split("|");
+
+//             let replacedLine = line.replaceAll(".", "|").replaceAll(" ", "|");
+//             let splitLine = replacedLine.split("|");
+
+//             let library = splitLine[1];
+//             let name = splitLine[2];
+//             let value = splitLineString[1];
+
+
+//             instructions.push({"type" : "VARIABLE", "library" : library, "name" : name, "value" : value});
+//         }
+//         if(line.startsWith("DEFINE "))
+//         {
+//             let replacedLine = line.replaceAll(' ', "|");
+//             let splitLine = replacedLine.split("|");
+
+//             let library = libraryName;
+//             let name = splitLine[1];
+//             let body = [];
+
+
+//             i++;
+//             line = lines[i];
+//             while((!line.startsWith("END") && i < lines.length))
+//             {
+//                 body.push(line);
+
+//                 i++;
+//                 line = lines[i];
+//             }
+
+
+//             instructions.push({"type" : "DEFINE", "library" : library, "name" : name, "body" : body});
+//         }
+//         if(line.startsWith("CALL "))
+//         {
+//             let replacedLine = line.replaceAll(".", "|").replaceAll(" ", "|");
+//             let splitLine = replacedLine.split("|");
+
+//             let library = splitLine[1];
+//             let name = splitLine[2];
+
+
+//             instructions.push({"type" : "CALL", "library" : library, "name" : name});
+//         }
+//     }
+//     return instructions;
+// }
+
+
+
+
+
+
+
+function parseLine(lineInput, libraryName)
 {
-    let instructions = [];
+    let instruction = {};
+
+    lineInput = cleanCode([lineInput]);
 
 
-    let lines = intoLines(codeString);
-
-    lines = cleanCode(lines);
-
-
-    console.log(lines);
-
-
-    for(let i = 0; i < lines.length; i++)
+    if(lineInput.length > 0)
     {
-        let line = lines[i];
+        let line = lineInput[0];
 
         if(line.startsWith("IMPORT "))
         {
@@ -24,7 +117,7 @@ function parse(codeString, libraryName)
             let library = splitLine[4];
 
 
-            instructions.push({"type" : "IMPORT", "lang" : lang, "library" : library});
+            instruction = {"type" : "IMPORT", "lang" : lang, "library" : library};
         }
         if(line.startsWith("ASSIGN "))
         {
@@ -37,7 +130,7 @@ function parse(codeString, libraryName)
             let variableValue = splitLine[4];
 
 
-            instructions.push({"type" : "ASSIGN", "library" : library, "name" : name, "libraryValue" : libraryValue, "variableValue" : variableValue});
+            instruction = {"type" : "ASSIGN", "library" : library, "name" : name, "libraryValue" : libraryValue, "variableValue" : variableValue};
         }
         if(line.startsWith("VARIABLE "))
         {
@@ -54,31 +147,36 @@ function parse(codeString, libraryName)
             let value = splitLineString[1];
 
 
-            instructions.push({"type" : "VARIABLE", "library" : library, "name" : name, "value" : value});
+            instruction = {"type" : "VARIABLE", "library" : libraryName, "name" : name, "value" : value};
         }
-        if(line.startsWith("DEFINE "))
-        {
-            let replacedLine = line.replaceAll(' ', "|");
-            let splitLine = replacedLine.split("|");
+        // if(line.startsWith("DEFINE "))
+        // {
+        //     let replacedLine = line.replaceAll(' ', "|");
+        //     let splitLine = replacedLine.split("|");
 
-            let library = libraryName;
-            let name = splitLine[1];
-            let body = [];
-
-
-            i++;
-            line = lines[i];
-            while((!line.startsWith("END") && i < lines.length))
-            {
-                body.push(line);
-
-                i++;
-                line = lines[i];
-            }
+        //     let library = libraryName;
+        //     let name = splitLine[1];
+        //     let body = [];
 
 
-            instructions.push({"type" : "DEFINE", "library" : library, "name" : name, "body" : body});
-        }
+        //     // i++;
+        //     // line = lines[i];
+        //     // while((!line.startsWith("END") && i < lines.length))
+        //     // {
+        //     //     body.push(line);
+
+        //     //     i++;
+        //     //     line = lines[i];
+        //     // }
+
+
+        //     instruction = {"type" : "DEFINE", "library" : libraryName, "name" : name, "body" : body};
+        // }
+
+        // if(line.startsWith("END"))
+        // {
+        //     instruction = {"type" : "END"};
+        // }
         if(line.startsWith("CALL "))
         {
             let replacedLine = line.replaceAll(".", "|").replaceAll(" ", "|");
@@ -88,11 +186,10 @@ function parse(codeString, libraryName)
             let name = splitLine[2];
 
 
-            instructions.push({"type" : "CALL", "library" : library, "name" : name});
+            instruction = {"type" : "CALL", "library" : library, "name" : name};
         }
     }
-    console.log(instructions);
-    return instructions;
+    return instruction;
 }
 
 
@@ -118,13 +215,14 @@ function cleanCode(lines)
 }
 
 
-function intoLines(codeString)
-{
-    return codeString.split("\n");
-}
+// function intoLines(codeString)
+// {
+//     return codeString.split("\n");
+// }
 
 
 
 module.exports = {
-    parse
+    // parse,
+    parseLine
 }

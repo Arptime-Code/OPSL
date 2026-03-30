@@ -1,8 +1,9 @@
 {
     "command" : "node",
     "parameters" : ["-i"],
-    "sentinelLog" : "console.log(\"__OPSL__\");\n",
-    "identifier" : "__OPSL__",
-    "variableLog" : "console.log(\"__OPSL__\" + variable + \"__OPSL__\")\n",
+    "sentinelLog" : "",
+    "identifier" : "\"",
+    "variableLog" : "console.log('\"' + String(variable) + '\"\\n')",
+    "variableSet" : "variable = value;",
     "functionLog" : "function();"
 }

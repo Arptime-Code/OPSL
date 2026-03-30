@@ -1,24 +1,7 @@
-// Import external libraries
-IMPORT [py] console
-IMPORT [js] math
+IMPORT [js] test
 
+ASSIGN test.thisString = test.hellio
 
+CALL test.sayHello
 
-// Define string variables
-VARIABLE testlib.message = "Trade executed successfully"
-VARIABLE testlib.errorMsg = "Insufficient balance"
-
-// Define custom function
-DEFINE calculateProfit
-  ASSIGN temp.profit = testlib.price
-  CALL math.max
-  VARIABLE result = "Profit: "
-  CALL console.log
-END
-
-// Call functions
-CALL console.log
-CALL testlib.calculateProfit
-
-
-CALL testlib.validateTrade
+ASSIGN test.thisString = test.hellio
