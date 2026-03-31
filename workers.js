@@ -47,12 +47,12 @@ class LanguageWorker {
     }
 
     setVariable(variableName, value, language) {
-        let code;
-        if (typeof value === "string") {
-            code = variableName + ' = "' + value + '";';
-        } else {
-            code = variableName + " = " + value + ";";
-        }
+        const code = variableName + ' = "' + value + '";';
+        vm.runInContext(code, this.context);
+    }
+
+    createVariable(variableName, value, language) {
+        const code = 'let ' + variableName + ' = "' + value + '";';
         vm.runInContext(code, this.context);
     }
 

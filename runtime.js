@@ -34,7 +34,8 @@ class Runtime
 
             if(instruction.type == "VARIABLE")
             {
-                this.opslVariables[instruction.name] = instruction.value;
+                const varLang = allWorkers[instruction.library].language;
+                await allWorkers[instruction.library].createVariable(instruction.name, instruction.value, varLang);
             }
             if(instruction.type == "ASSIGN")
             {
@@ -74,7 +75,8 @@ class Runtime
 
             if(instruction.type == "VARIABLE")
             {
-                this.opslVariables[instruction.name] = instruction.value;
+                const varLang = allWorkers[instruction.library].language;
+                await allWorkers[instruction.library].createVariable(instruction.name, instruction.value, varLang);
             }
             if(instruction.type == "ASSIGN")
             {

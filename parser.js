@@ -42,7 +42,7 @@ function parseLine(lineInput, libraryName)
             let name = splitLine[2];
             let value = splitLineString[1];
 
-            instruction = {"type" : "VARIABLE", "library" : libraryName, "name" : name, "value" : value};
+            instruction = {"type" : "VARIABLE", "library" : library, "name" : name, "value" : value};
         }
         if(line.startsWith("CALL "))
         {

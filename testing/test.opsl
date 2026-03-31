@@ -1,6 +1,10 @@
 IMPORT [js] test
 
+VARIABLE test.newVar = "helloWorld"
+
 ASSIGN test.thisString = test.hellio
+
+ASSIGN test.copyOfNew = test.newVar
 
 CALL test.sayHello
 
