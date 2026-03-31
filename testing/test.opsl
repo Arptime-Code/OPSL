@@ -1,11 +1,18 @@
 IMPORT [js] test
 
+IMPORT [opsl] helloOPSL
+
+IMPORT [opsl] greetingOPSL
+
+IMPORT [js] greeting
+
+
+
 VARIABLE test.newVar = "helloWorld"
 
 ASSIGN test.thisString = test.hellio
 
-ASSIGN test.copyOfNew = test.newVar
-
 CALL test.sayHello
 
-ASSIGN test.thisString = test.hellio
+
+CALL greeting.showMessage

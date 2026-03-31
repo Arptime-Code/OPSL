@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const readline = require('readline/promises');
 
 const parser = require("./parser");
@@ -6,102 +7,115 @@ const workerLib = require("./workers");
 
 let inputFile = process.argv[2];
 
-let allWorkers = {};
-
 class Runtime
 {
-    opslVariables = {};
-    opslFunctions = {};
+    currentFilePath = null;
+    baseFilePath = null;
+    allWorkers = {};
 
-    constructor()
+    constructor(currentFilePath = null, baseFilePath = null)
     {
+        this.currentFilePath = currentFilePath;
+        this.baseFilePath = baseFilePath || currentFilePath;
     }
 
-    async interactiveMode()
+    getBaseDir()
     {
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
+        return path.dirname(this.baseFilePath);
+    }
 
-        let userInput = "";
-
-        while((userInput != "exit"))
+    async handleImport(instruction)
+    {
+        if(this.allWorkers[instruction.library])
         {
-            userInput = await rl.question('> ');
+            return;
+        }
 
-            let instruction = parser.parseLine(userInput, "lib");
+        const baseDir = this.getBaseDir();
+        
+        if(instruction.lang === "opsl")
+        {
+            const opslDir = path.join(baseDir, "opsl-local", instruction.library);
+            const jsDir = path.join(baseDir, "opsl-local", instruction.library);
+            
+            const jsFilePath = path.join(jsDir, instruction.library + ".js");
+            if(fs.existsSync(jsFilePath))
+            {
+                this.allWorkers[instruction.library] = new workerLib.LanguageWorker("js", jsFilePath);
+            }
+            else
+            {
+                this.allWorkers[instruction.library] = new workerLib.LanguageWorker("js", undefined);
+            }
 
-            if(instruction.type == "VARIABLE")
+            const opslFilePath = path.join(opslDir, instruction.library + ".opsl");
+            if(fs.existsSync(opslFilePath))
             {
-                const varLang = allWorkers[instruction.library].language;
-                await allWorkers[instruction.library].createVariable(instruction.name, instruction.value, varLang);
-            }
-            if(instruction.type == "ASSIGN")
-            {
-                const libraryLang = allWorkers[instruction.libraryValue].language;
-                const variableValue = await allWorkers[instruction.libraryValue].getVariable(instruction.variableValue, libraryLang);
-                const targetLang = allWorkers[instruction.library].language;
-                await allWorkers[instruction.library].setVariable(instruction.name, variableValue, targetLang);
-            }
-            if(instruction.type == "IMPORT")
-            {
-                const workerLang = instruction.lang === "opsl" ? "js" : instruction.lang;
-                allWorkers[instruction.library] = new workerLib.LanguageWorker(workerLang, instruction.library + ".js");
-            }
-            if(instruction.type == "CALL")
-            {
-                const callLang = allWorkers[instruction.library].language;
-                await allWorkers[instruction.library].executeFunction(instruction.name, callLang);
+                const opslFileString = fs.readFileSync(opslFilePath, 'utf8');
+                const nestedRuntime = new Runtime(opslFilePath, this.baseFilePath);
+                nestedRuntime.allWorkers = this.allWorkers;
+                await nestedRuntime.processOPSLString(opslFileString, instruction.library);
             }
         }
-        rl.close();
+        else
+        {
+            const libDir = path.join(baseDir, "opsl-local", instruction.library);
+            const jsFilePath = path.join(libDir, instruction.library + ".js");
+            
+            if(fs.existsSync(jsFilePath))
+            {
+                this.allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, jsFilePath);
+            }
+            else
+            {
+                this.allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, undefined);
+            }
+        }
     }
 
-    async inputMode(fileString, libraryName)
+    async processOPSLString(fileString, libraryName)
     {
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-
         let splitString = fileString.split("\n");
-        let userInput = "";
-
+        
         for(let y = 0; y < splitString.length; y++)
         {
-            userInput = splitString[y];
-
+            let userInput = splitString[y];
             let instruction = parser.parseLine(userInput, libraryName);
 
             if(instruction.type == "VARIABLE")
             {
-                const varLang = allWorkers[instruction.library].language;
-                await allWorkers[instruction.library].createVariable(instruction.name, instruction.value, varLang);
+                if(this.allWorkers[instruction.library])
+                {
+                    const varLang = this.allWorkers[instruction.library].language;
+                    await this.allWorkers[instruction.library].createVariable(instruction.name, instruction.value, varLang);
+                }
             }
             if(instruction.type == "ASSIGN")
             {
-                const libraryLang = allWorkers[instruction.libraryValue].language;
-                const variableValue = await allWorkers[instruction.libraryValue].getVariable(instruction.variableValue, libraryLang);
-                const targetLang = allWorkers[instruction.library].language;
-                await allWorkers[instruction.library].setVariable(instruction.name, variableValue, targetLang);
+                const libraryLang = this.allWorkers[instruction.libraryValue].language;
+                const variableValue = await this.allWorkers[instruction.libraryValue].getVariable(instruction.variableValue, libraryLang);
+                const targetLang = this.allWorkers[instruction.library].language;
+                await this.allWorkers[instruction.library].setVariable(instruction.name, variableValue, targetLang);
             }
             if(instruction.type == "IMPORT")
             {
-                const workerLang = instruction.lang === "opsl" ? "js" : instruction.lang;
-                allWorkers[instruction.library] = new workerLib.LanguageWorker(workerLang, instruction.library + ".js");
+                await this.handleImport(instruction);
             }
             if(instruction.type == "CALL")
             {
-                const callLang = allWorkers[instruction.library].language;
-                await allWorkers[instruction.library].executeFunction(instruction.name, callLang);
+                const callLang = this.allWorkers[instruction.library].language;
+                await this.allWorkers[instruction.library].executeFunction(instruction.name, callLang);
             }
         }
-        rl.close();
+    }
+
+    async inputMode(fileString, libraryName)
+    {
+        await this.processOPSLString(fileString, libraryName);
     }
 }
 
-const runtime = new Runtime();
+const runtime = new Runtime(inputFile);
 let inputFileString = fs.readFileSync(inputFile, 'utf8');
 let libraryName = inputFile.split("/")[inputFile.split("/").length - 2];
 console.log( fs.readFileSync(inputFile, 'utf8'));
