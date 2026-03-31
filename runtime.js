@@ -38,8 +38,10 @@ class Runtime
             }
             if(instruction.type == "ASSIGN")
             {
-                const variableValue = await allWorkers[instruction.libraryValue].getVariable(instruction.variableValue);
-                await allWorkers[instruction.library].setVariable(instruction.name, variableValue);
+                const libraryLang = allWorkers[instruction.libraryValue].language;
+                const variableValue = await allWorkers[instruction.libraryValue].getVariable(instruction.variableValue, libraryLang);
+                const targetLang = allWorkers[instruction.library].language;
+                await allWorkers[instruction.library].setVariable(instruction.name, variableValue, targetLang);
             }
             if(instruction.type == "IMPORT")
             {
@@ -47,13 +49,14 @@ class Runtime
             }
             if(instruction.type == "CALL")
             {
-                await allWorkers[instruction.library].executeFunction(instruction.name);
+                const callLang = allWorkers[instruction.library].language;
+                await allWorkers[instruction.library].executeFunction(instruction.name, callLang);
             }
         }
         rl.close();
     }
 
-    async inputMode(fileString)
+    async inputMode(fileString, libraryName)
     {
         const rl = readline.createInterface({
             input: process.stdin,
@@ -67,7 +70,7 @@ class Runtime
         {
             userInput = splitString[y];
 
-            let instruction = parser.parseLine(userInput, "lib");
+            let instruction = parser.parseLine(userInput, libraryName);
 
             if(instruction.type == "VARIABLE")
             {
@@ -75,8 +78,10 @@ class Runtime
             }
             if(instruction.type == "ASSIGN")
             {
-                const variableValue = await allWorkers[instruction.libraryValue].getVariable(instruction.variableValue);
-                await allWorkers[instruction.library].setVariable(instruction.name, variableValue);
+                const libraryLang = allWorkers[instruction.libraryValue].language;
+                const variableValue = await allWorkers[instruction.libraryValue].getVariable(instruction.variableValue, libraryLang);
+                const targetLang = allWorkers[instruction.library].language;
+                await allWorkers[instruction.library].setVariable(instruction.name, variableValue, targetLang);
             }
             if(instruction.type == "IMPORT")
             {
@@ -84,7 +89,8 @@ class Runtime
             }
             if(instruction.type == "CALL")
             {
-                await allWorkers[instruction.library].executeFunction(instruction.name);
+                const callLang = allWorkers[instruction.library].language;
+                await allWorkers[instruction.library].executeFunction(instruction.name, callLang);
             }
         }
         rl.close();
@@ -93,6 +99,7 @@ class Runtime
 
 const runtime = new Runtime();
 let inputFileString = fs.readFileSync(inputFile, 'utf8');
+let libraryName = inputFile.split("/")[inputFile.split("/").length - 2];
 console.log( fs.readFileSync(inputFile, 'utf8'));
-runtime.inputMode(inputFileString);
+runtime.inputMode(inputFileString, libraryName);
 console.log("hi");

@@ -3,8 +3,10 @@ const vm = require("vm");
 class LanguageWorker {
     context;
     capturedOutput = "";
+    language;
 
     constructor(language, libraryFile) {
+        this.language = language;
         this.context = vm.createContext({
             console: {
                 log: (...args) => {
@@ -36,15 +38,15 @@ class LanguageWorker {
         if (libraryFile) {
             const fs = require("fs");
             const code = fs.readFileSync(libraryFile, "utf8");
-            this.send(code);
+            this.send(code, language);
         }
     }
 
-    send(code) {
+    send(code, language) {
         vm.runInContext(code, this.context);
     }
 
-    setVariable(variableName, value) {
+    setVariable(variableName, value, language) {
         let code;
         if (typeof value === "string") {
             code = variableName + ' = "' + value + '";';
@@ -54,13 +56,13 @@ class LanguageWorker {
         vm.runInContext(code, this.context);
     }
 
-    getVariable(variableName) {
+    getVariable(variableName, language) {
         this.capturedOutput = "";
         vm.runInContext("console.log(" + variableName + ")", this.context);
         return this.capturedOutput;
     }
 
-    async executeFunction(functionName) {
+    async executeFunction(functionName, language) {
         vm.runInContext(functionName + "()", this.context);
     }
 
