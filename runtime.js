@@ -46,7 +46,8 @@ class Runtime
             }
             if(instruction.type == "IMPORT")
             {
-                allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, instruction.library + ".js");
+                const workerLang = instruction.lang === "opsl" ? "js" : instruction.lang;
+                allWorkers[instruction.library] = new workerLib.LanguageWorker(workerLang, instruction.library + ".js");
             }
             if(instruction.type == "CALL")
             {
@@ -87,7 +88,8 @@ class Runtime
             }
             if(instruction.type == "IMPORT")
             {
-                allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, instruction.library + ".js");
+                const workerLang = instruction.lang === "opsl" ? "js" : instruction.lang;
+                allWorkers[instruction.library] = new workerLib.LanguageWorker(workerLang, instruction.library + ".js");
             }
             if(instruction.type == "CALL")
             {
