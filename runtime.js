@@ -129,14 +129,7 @@ class Runtime
                 }
                 if(instruction.type == "IMPORT")
                 {
-                    //instrction library has to have a path to .local-offlinepm
-
-                    //How to realy wait until a library is fully executed????
-                    // console.log("hi");
                     allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, instruction.library + ".js");
-                    
-                    // Wait for library initialization
-                    await new Promise(r => setTimeout(r, 200));
                 }
                 if(instruction.type == "CALL")
                 {
@@ -226,8 +219,6 @@ class Runtime
                     console.log("hi");
                     allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, instruction.library + ".js");
                     
-                    // Wait for library initialization
-                    await new Promise(r => setTimeout(r, 200));
                 }
                 if(instruction.type == "CALL")
                 {
@@ -241,8 +232,8 @@ class Runtime
 
 
 const runtime = new Runtime();
-runtime.interactiveMode();
-// let inputFileString = fs.readFileSync(inputFile, 'utf8');
-// console.log( fs.readFileSync(inputFile, 'utf8'));
-// runtime.inputMode(inputFileString);
-// console.log("hi");
+// runtime.interactiveMode();
+let inputFileString = fs.readFileSync(inputFile, 'utf8');
+console.log( fs.readFileSync(inputFile, 'utf8'));
+runtime.inputMode(inputFileString);
+console.log("hi");

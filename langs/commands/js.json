@@ -3,7 +3,7 @@
     "parameters" : ["-i"],
     "sentinelLog" : "",
     "identifier" : "\"",
-    "variableLog" : "console.log('\"' + String(variable) + '\"\\n')",
+    "variableLog" : "console.log(variable)",
     "variableSet" : "variable = value;",
     "functionLog" : "function();"
 }
