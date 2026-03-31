@@ -47,6 +47,8 @@ class Runtime
             {
                 this.allWorkers[instruction.library] = new workerLib.LanguageWorker("js", undefined);
             }
+            
+            this.allWorkers[instruction.library].originalLang = "opsl";
 
             const opslFilePath = path.join(opslDir, instruction.library + ".opsl");
             if(fs.existsSync(opslFilePath))
@@ -103,8 +105,27 @@ class Runtime
             }
             if(instruction.type == "CALL")
             {
-                const callLang = this.allWorkers[instruction.library].language;
-                await this.allWorkers[instruction.library].executeFunction(instruction.name, callLang);
+                const worker = this.allWorkers[instruction.library];
+                
+                if(worker.originalLang === "opsl")
+                {
+                    const baseDir = this.getBaseDir();
+                    const libDir = path.join(baseDir, "opsl-local", instruction.library);
+                    const functionFilePath = path.join(libDir, instruction.name + ".opsl");
+                    
+                    if(fs.existsSync(functionFilePath))
+                    {
+                        const functionFileString = fs.readFileSync(functionFilePath, 'utf8');
+                        const nestedRuntime = new Runtime(functionFilePath, this.baseFilePath);
+                        nestedRuntime.allWorkers = this.allWorkers;
+                        await nestedRuntime.processOPSLString(functionFileString, instruction.library);
+                    }
+                }
+                else
+                {
+                    const callLang = worker.language;
+                    await worker.executeFunction(instruction.name, callLang);
+                }
             }
         }
     }

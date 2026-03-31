@@ -1,0 +1,4 @@
+IMPORT [js] test
+
+
+CALL test.sayHello

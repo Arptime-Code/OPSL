@@ -16,3 +16,6 @@ CALL test.sayHello
 
 
 CALL greeting.showMessage
+
+
+CALL greetingOPSL.greeted
