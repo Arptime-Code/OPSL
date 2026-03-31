@@ -1,0 +1,6 @@
+{
+    "variableLog" : "printf(\"%s\\n\", variable)",
+    "variableSet" : "variable = value;",
+    "variableCreate" : "variable = value;",
+    "functionLog" : "function();"
+}

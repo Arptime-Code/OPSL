@@ -1,0 +1,6 @@
+{
+    "variableLog" : "console.log(variable)",
+    "variableSet" : "variable = \"value\";",
+    "variableCreate" : "let variable = \"value\";",
+    "functionLog" : "function();"
+}

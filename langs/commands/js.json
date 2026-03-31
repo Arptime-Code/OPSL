@@ -1,10 +1,6 @@
 {
-    "command" : "node",
-    "parameters" : ["-i"],
-    "sentinelLog" : "",
-    "identifier" : "\"",
     "variableLog" : "console.log(variable)",
-    "variableSet" : "variable = value;",
-    "variableCreate" : "let variable = value;",
+    "variableSet" : "variable = \"value\";",
+    "variableCreate" : "let variable = \"value\";",
     "functionLog" : "function();"
 }

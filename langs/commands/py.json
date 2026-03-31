@@ -1,6 +1,6 @@
 {
-    "command": "python3",
-    "parameters": ["-i"],
-    "getVariableCommand" : "print(\"__OPSL__\")\n",
-    "identifier" : "__OPSL__"
+    "variableLog" : "print(variable)",
+    "variableSet" : "variable = value;",
+    "variableCreate" : "variable = value;",
+    "functionLog" : "function()"
 }

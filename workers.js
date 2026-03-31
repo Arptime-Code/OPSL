@@ -1,12 +1,16 @@
 const vm = require("vm");
+const fs = require("fs");
 
 class LanguageWorker {
     context;
     capturedOutput = "";
     language;
+    config;
 
     constructor(language, libraryFile) {
         this.language = language;
+        this.config = JSON.parse(fs.readFileSync("langs/commands/" + language + ".json", "utf8"));
+
         this.context = vm.createContext({
             console: {
                 log: (...args) => {
@@ -36,7 +40,6 @@ class LanguageWorker {
         });
 
         if (libraryFile) {
-            const fs = require("fs");
             const code = fs.readFileSync(libraryFile, "utf8");
             this.send(code, language);
         }
@@ -47,23 +50,25 @@ class LanguageWorker {
     }
 
     setVariable(variableName, value, language) {
-        const code = variableName + ' = "' + value + '";';
+        const code = this.config.variableSet.replace("variable", variableName).replace("value", value);
         vm.runInContext(code, this.context);
     }
 
     createVariable(variableName, value, language) {
-        const code = 'let ' + variableName + ' = "' + value + '";';
+        const code = this.config.variableCreate.replace("variable", variableName).replace("value", value);
         vm.runInContext(code, this.context);
     }
 
     getVariable(variableName, language) {
         this.capturedOutput = "";
-        vm.runInContext("console.log(" + variableName + ")", this.context);
+        const code = this.config.variableLog.replace("variable", variableName);
+        vm.runInContext(code, this.context);
         return this.capturedOutput;
     }
 
     async executeFunction(functionName, language) {
-        vm.runInContext(functionName + "()", this.context);
+        const code = this.config.functionLog.replace("function", functionName);
+        vm.runInContext(code, this.context);
     }
 
     getOutput() {
