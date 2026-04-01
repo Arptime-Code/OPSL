@@ -1,0 +1,3 @@
+VARIABLE opsl.function = ""
+
+CALL opsl.function

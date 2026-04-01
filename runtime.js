@@ -4,6 +4,7 @@ const readline = require('readline/promises');
 
 const parser = require("./parser");
 const workerLib = require("./workers");
+const nativeLib = require("./native-library/library");
 
 let inputFile = process.argv[2];
 
@@ -82,7 +83,7 @@ class Runtime
         for(let y = 0; y < splitString.length; y++)
         {
             let userInput = splitString[y];
-            let instruction = parser.parseLine(userInput, libraryName);
+            let instruction = parser.parseLine(userInput);
 
             if(instruction.type == "VARIABLE")
             {
@@ -105,26 +106,34 @@ class Runtime
             }
             if(instruction.type == "CALL")
             {
-                const worker = this.allWorkers[instruction.library];
-                
-                if(worker.originalLang === "opsl")
+                if(instruction.library === "opsl" && instruction.name === "functionCall")
                 {
-                    const baseDir = this.getBaseDir();
-                    const libDir = path.join(baseDir, "opsl-local", instruction.library);
-                    const functionFilePath = path.join(libDir, instruction.name + ".opsl");
-                    
-                    if(fs.existsSync(functionFilePath))
-                    {
-                        const functionFileString = fs.readFileSync(functionFilePath, 'utf8');
-                        const nestedRuntime = new Runtime(functionFilePath, this.baseFilePath);
-                        nestedRuntime.allWorkers = this.allWorkers;
-                        await nestedRuntime.processOPSLString(functionFileString, instruction.library);
-                    }
+                    const functionString = await this.allWorkers["opsl"].getVariable("functionVar", "opsl");
+                    await nativeLib.callFunction(functionString, this.allWorkers);
                 }
                 else
                 {
-                    const callLang = worker.language;
-                    await worker.executeFunction(instruction.name, callLang);
+                    const worker = this.allWorkers[instruction.library];
+                    
+                    if(worker.originalLang === "opsl")
+                    {
+                        const baseDir = this.getBaseDir();
+                        const libDir = path.join(baseDir, "opsl-local", instruction.library);
+                        const functionFilePath = path.join(libDir, instruction.name + ".opsl");
+                        
+                        if(fs.existsSync(functionFilePath))
+                        {
+                            const functionFileString = fs.readFileSync(functionFilePath, 'utf8');
+                            const nestedRuntime = new Runtime(functionFilePath, this.baseFilePath);
+                            nestedRuntime.allWorkers = this.allWorkers;
+                            await nestedRuntime.processOPSLString(functionFileString, instruction.library);
+                        }
+                    }
+                    else
+                    {
+                        const callLang = worker.language;
+                        await worker.executeFunction(instruction.name, callLang);
+                    }
                 }
             }
         }

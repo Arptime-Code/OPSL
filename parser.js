@@ -1,80 +1,56 @@
-function parseLine(lineInput, libraryName)
+function parseLine(lineInput)
 {
     let instruction = {};
-
-    lineInput = cleanCode([lineInput]);
-
-    if(lineInput.length > 0)
+    
+    let trimmed = lineInput.trim();
+    
+    if(trimmed.startsWith("IMPORT "))
     {
-        let line = lineInput[0];
+        let splitLine = splitBy(trimmed, " ", "[", "]");
 
-        if(line.startsWith("IMPORT "))
-        {
-            let replacedLine = line.replaceAll(" ", "|").replaceAll("[", "|").replaceAll("]", "|");
-            let splitLine = replacedLine.split("|");
+        let lang = splitLine[2];
+        let library = splitLine[4];
 
-            let lang = splitLine[2];
-            let library = splitLine[4];
+        instruction = {"type" : "IMPORT", "lang" : lang, "library" : library};
+    }
+    if(trimmed.startsWith("ASSIGN "))
+    {
+        let splitLine = splitBy(trimmed, " = ", ".", " ");
 
-            instruction = {"type" : "IMPORT", "lang" : lang, "library" : library};
-        }
-        if(line.startsWith("ASSIGN "))
-        {
-            let replacedLine = line.replaceAll(" = ", "|").replaceAll(".", "|").replaceAll(" ", "|");
-            let splitLine = replacedLine.split("|");
+        let library = splitLine[1];
+        let name = splitLine[2];
+        let libraryValue = splitLine[3];
+        let variableValue = splitLine[4];
 
-            let library = splitLine[1];
-            let name = splitLine[2];
-            let libraryValue = splitLine[3];
-            let variableValue = splitLine[4];
+        instruction = {"type" : "ASSIGN", "library" : library, "name" : name, "libraryValue" : libraryValue, "variableValue" : variableValue};
+    }
+    if(trimmed.startsWith("VARIABLE "))
+    {
+        let splitLine = splitBy(trimmed, "VARIABLE ", " = ", ".", '"');
 
-            instruction = {"type" : "ASSIGN", "library" : library, "name" : name, "libraryValue" : libraryValue, "variableValue" : variableValue};
-        }
-        if(line.startsWith("VARIABLE "))
-        {
-            let replacedLineString = line.replaceAll('"', "|");
-            let splitLineString = replacedLineString.split("|");
+        let library = splitLine[1];
+        let name = splitLine[2];
+        let value = splitLine[4] + "." + splitLine[5];
 
-            let replacedLine = line.replaceAll(".", "|").replaceAll(" ", "|");
-            let splitLine = replacedLine.split("|");
+        instruction = {"type" : "VARIABLE", "library" : library, "name" : name, "value" : value};
+    }
+    if(trimmed.startsWith("CALL "))
+    {
+        let splitLine = splitBy(trimmed, ".", " ");
 
-            let library = splitLine[1];
-            let name = splitLine[2];
-            let value = splitLineString[1];
+        let library = splitLine[1];
+        let name = splitLine[2];
 
-            instruction = {"type" : "VARIABLE", "library" : library, "name" : name, "value" : value};
-        }
-        if(line.startsWith("CALL "))
-        {
-            let replacedLine = line.replaceAll(".", "|").replaceAll(" ", "|");
-            let splitLine = replacedLine.split("|");
-
-            let library = splitLine[1];
-            let name = splitLine[2];
-
-            instruction = {"type" : "CALL", "library" : library, "name" : name};
-        }
+        instruction = {"type" : "CALL", "library" : library, "name" : name};
     }
     return instruction;
 }
 
-function cleanCode(lines)
-{
-    let cleanedLines = [];
-
-    for(let i = 0; i < lines.length; i++)
-    {
-        let line = lines[i];
-
-        trimmedLine = line.trim();
-
-        if((trimmedLine != "" && trimmedLine != " " && !trimmedLine.startsWith("//")))
-        {
-            cleanedLines.push(trimmedLine);
-        }
+function splitBy(text, ...replacements) {
+    for (let i = 0; i < replacements.length; i++) {
+        text = text.replaceAll(replacements[i], "|");
     }
-
-    return cleanedLines;
+    return text.split("|");
 }
 
 module.exports = {

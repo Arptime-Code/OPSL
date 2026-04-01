@@ -1,0 +1,7 @@
+IMPORT [js] greeting
+
+IMPORT [opsl] opsl
+
+VARIABLE opsl.functionVar = "greeting.greet"
+
+CALL opsl.functionCall
