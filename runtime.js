@@ -6,13 +6,15 @@ const parser = require("./parser");
 const workerLib = require("./workers");
 const nativeLib = require("./native-library/library");
 
+const globalLibraries = {};
+
 let inputFile = process.argv[2];
 
 class Runtime
 {
     currentFilePath = null;
     baseFilePath = null;
-    allWorkers = {};
+    importedLibraries = {};
 
     constructor(currentFilePath = null, baseFilePath = null)
     {
@@ -27,7 +29,7 @@ class Runtime
 
     async handleImport(instruction)
     {
-        if(this.allWorkers[instruction.library])
+        if(this.importedLibraries[instruction.library])
         {
             return;
         }
@@ -42,21 +44,21 @@ class Runtime
             const jsFilePath = path.join(jsDir, instruction.library + ".js");
             if(fs.existsSync(jsFilePath))
             {
-                this.allWorkers[instruction.library] = new workerLib.LanguageWorker("js", jsFilePath);
+                globalLibraries[instruction.library] = new workerLib.LanguageWorker("js", jsFilePath);
             }
             else
             {
-                this.allWorkers[instruction.library] = new workerLib.LanguageWorker("js", undefined);
+                globalLibraries[instruction.library] = new workerLib.LanguageWorker("js", undefined);
             }
             
-            this.allWorkers[instruction.library].originalLang = "opsl";
+            globalLibraries[instruction.library].originalLang = "opsl";
 
             const opslFilePath = path.join(opslDir, instruction.library + ".opsl");
             if(fs.existsSync(opslFilePath))
             {
                 const opslFileString = fs.readFileSync(opslFilePath, 'utf8');
                 const nestedRuntime = new Runtime(opslFilePath, this.baseFilePath);
-                nestedRuntime.allWorkers = this.allWorkers;
+                nestedRuntime.importedLibraries = this.importedLibraries;
                 await nestedRuntime.processOPSLString(opslFileString, instruction.library);
             }
         }
@@ -67,13 +69,15 @@ class Runtime
             
             if(fs.existsSync(jsFilePath))
             {
-                this.allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, jsFilePath);
+                globalLibraries[instruction.library] = new workerLib.LanguageWorker(instruction.lang, jsFilePath);
             }
             else
             {
-                this.allWorkers[instruction.library] = new workerLib.LanguageWorker(instruction.lang, undefined);
+                globalLibraries[instruction.library] = new workerLib.LanguageWorker(instruction.lang, undefined);
             }
         }
+
+        this.importedLibraries[instruction.library] = true;
     }
 
     async processOPSLString(fileString, libraryName)
@@ -87,18 +91,22 @@ class Runtime
 
             if(instruction.type == "VARIABLE")
             {
-                if(this.allWorkers[instruction.library])
+                if(this.importedLibraries[instruction.library])
                 {
-                    const varLang = this.allWorkers[instruction.library].language;
-                    await this.allWorkers[instruction.library].createVariable(instruction.name, instruction.value);
+                    const varLang = globalLibraries[instruction.library].language;
+                    await globalLibraries[instruction.library].createVariable(instruction.name, instruction.value);
                 }
             }
             if(instruction.type == "ASSIGN")
             {
-                const libraryLang = this.allWorkers[instruction.libraryValue].language;
-                const variableValue = await this.allWorkers[instruction.libraryValue].getVariable(instruction.variableValue);
-                const targetLang = this.allWorkers[instruction.library].language;
-                await this.allWorkers[instruction.library].setVariable(instruction.name, variableValue);
+                if(!this.importedLibraries[instruction.library] || !this.importedLibraries[instruction.libraryValue])
+                {
+                    continue;
+                }
+                const libraryLang = globalLibraries[instruction.libraryValue].language;
+                const variableValue = await globalLibraries[instruction.libraryValue].getVariable(instruction.variableValue);
+                const targetLang = globalLibraries[instruction.library].language;
+                await globalLibraries[instruction.library].setVariable(instruction.name, variableValue);
             }
             if(instruction.type == "IMPORT")
             {
@@ -106,14 +114,19 @@ class Runtime
             }
             if(instruction.type == "CALL")
             {
+                if(!this.importedLibraries[instruction.library])
+                {
+                    continue;
+                }
+
                 if(instruction.library === "opsl" && instruction.name === "functionCall")
                 {
-                    const functionString = await this.allWorkers["opsl"].getVariable("functionVar");
-                    await nativeLib.callFunction(functionString, this.allWorkers);
+                    const functionString = await globalLibraries["opsl"].getVariable("functionVar");
+                    await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries);
                 }
                 else
                 {
-                    const worker = this.allWorkers[instruction.library];
+                    const worker = globalLibraries[instruction.library];
                     
                     if(worker.originalLang === "opsl")
                     {
@@ -125,7 +138,7 @@ class Runtime
                         {
                             const functionFileString = fs.readFileSync(functionFilePath, 'utf8');
                             const nestedRuntime = new Runtime(functionFilePath, this.baseFilePath);
-                            nestedRuntime.allWorkers = this.allWorkers;
+                            nestedRuntime.importedLibraries = this.importedLibraries;
                             await nestedRuntime.processOPSLString(functionFileString, instruction.library);
                         }
                     }

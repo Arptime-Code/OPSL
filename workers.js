@@ -13,30 +13,17 @@ class LanguageWorker {
 
         this.context = vm.createContext({
             console: {
-                log: (...args) => {
-                    this.capturedOutput = args.map(a => String(a)).join(" ");
+                log: function(...args) {
+                    this.capturedOutput = args.join(" ");
                     console.log(...args);
                 },
-                error: (...args) => console.error(...args),
-                warn: (...args) => console.warn(...args),
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); }
             },
             setTimeout: setTimeout,
             setInterval: setInterval,
             clearTimeout: clearTimeout,
-            clearInterval: clearInterval,
-            Promise: Promise,
-            Math: Math,
-            Date: Date,
-            JSON: JSON,
-            Array: Array,
-            Object: Object,
-            String: String,
-            Number: Number,
-            Boolean: Boolean,
-            Error: Error,
-            TypeError: TypeError,
-            RangeError: RangeError,
-            SyntaxError: SyntaxError,
+            clearInterval: clearInterval
         });
 
         if (libraryFile) {

@@ -1,14 +1,19 @@
 class NativeOPSL
 {
-    async callFunction(functionString, allWorkers)
+    async callFunction(functionString, globalLibraries, importedLibraries)
     {
         const parts = functionString.split(".");
         const libraryName = parts[0];
         const functionName = parts[1];
         
-        if(allWorkers[libraryName])
+        if(!importedLibraries[libraryName])
         {
-            const worker = allWorkers[libraryName];
+            return;
+        }
+        
+        if(globalLibraries[libraryName])
+        {
+            const worker = globalLibraries[libraryName];
             
             if(worker.originalLang === "opsl")
             {
@@ -24,7 +29,7 @@ class NativeOPSL
                     const functionFileString = fs.readFileSync(functionFilePath, 'utf8');
                     const Runtime = require("./runtime");
                     const nestedRuntime = new Runtime(functionFilePath);
-                    nestedRuntime.allWorkers = allWorkers;
+                    nestedRuntime.importedLibraries = importedLibraries;
                     await nestedRuntime.processOPSLString(functionFileString, libraryName);
                 }
             }
