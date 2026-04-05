@@ -90,15 +90,15 @@ class Runtime
                 if(this.allWorkers[instruction.library])
                 {
                     const varLang = this.allWorkers[instruction.library].language;
-                    await this.allWorkers[instruction.library].createVariable(instruction.name, instruction.value, varLang);
+                    await this.allWorkers[instruction.library].createVariable(instruction.name, instruction.value);
                 }
             }
             if(instruction.type == "ASSIGN")
             {
                 const libraryLang = this.allWorkers[instruction.libraryValue].language;
-                const variableValue = await this.allWorkers[instruction.libraryValue].getVariable(instruction.variableValue, libraryLang);
+                const variableValue = await this.allWorkers[instruction.libraryValue].getVariable(instruction.variableValue);
                 const targetLang = this.allWorkers[instruction.library].language;
-                await this.allWorkers[instruction.library].setVariable(instruction.name, variableValue, targetLang);
+                await this.allWorkers[instruction.library].setVariable(instruction.name, variableValue);
             }
             if(instruction.type == "IMPORT")
             {
@@ -108,7 +108,7 @@ class Runtime
             {
                 if(instruction.library === "opsl" && instruction.name === "functionCall")
                 {
-                    const functionString = await this.allWorkers["opsl"].getVariable("functionVar", "opsl");
+                    const functionString = await this.allWorkers["opsl"].getVariable("functionVar");
                     await nativeLib.callFunction(functionString, this.allWorkers);
                 }
                 else
@@ -131,8 +131,7 @@ class Runtime
                     }
                     else
                     {
-                        const callLang = worker.language;
-                        await worker.executeFunction(instruction.name, callLang);
+                        await worker.executeFunction(instruction.name);
                     }
                 }
             }

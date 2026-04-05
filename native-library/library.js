@@ -30,7 +30,7 @@ class NativeOPSL
             }
             else
             {
-                await worker.executeFunction(functionName, worker.language);
+                await worker.executeFunction(functionName);
             }
         }
     }

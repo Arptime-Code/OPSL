@@ -41,32 +41,32 @@ class LanguageWorker {
 
         if (libraryFile) {
             const code = fs.readFileSync(libraryFile, "utf8");
-            this.send(code, language);
+            this.send(code);
         }
     }
 
-    send(code, language) {
+    send(code) {
         vm.runInContext(code, this.context);
     }
 
-    setVariable(variableName, value, language) {
+    setVariable(variableName, value) {
         const code = this.config.variableSet.replace("variable", variableName).replace("value", value);
         vm.runInContext(code, this.context);
     }
 
-    createVariable(variableName, value, language) {
+    createVariable(variableName, value) {
         const code = this.config.variableCreate.replace("variable", variableName).replace("value", value);
         vm.runInContext(code, this.context);
     }
 
-    getVariable(variableName, language) {
+    getVariable(variableName) {
         this.capturedOutput = "";
         const code = this.config.variableLog.replace("variable", variableName);
         vm.runInContext(code, this.context);
         return this.capturedOutput;
     }
 
-    async executeFunction(functionName, language) {
+    async executeFunction(functionName) {
         const code = this.config.functionLog.replace("function", functionName);
         vm.runInContext(code, this.context);
     }
