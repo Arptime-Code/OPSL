@@ -154,8 +154,24 @@ class Runtime
     async executeOPSLFunction(library, name)
     {
         const baseDir = this.getBaseDir();
-        const libDir = path.join(baseDir, "opsl-local", library);
-        const functionFilePath = path.join(libDir, name + ".opsl");
+        const projectFolder = path.basename(baseDir);
+        
+        let functionFilePath;
+        
+        if(library === projectFolder)
+        {
+            functionFilePath = path.join(baseDir, name + ".opsl");
+            if(!fs.existsSync(functionFilePath))
+            {
+                const libDir = path.join(baseDir, "opsl-local", library);
+                functionFilePath = path.join(libDir, name + ".opsl");
+            }
+        }
+        else
+        {
+            const libDir = path.join(baseDir, "opsl-local", library);
+            functionFilePath = path.join(libDir, name + ".opsl");
+        }
         
         if(fs.existsSync(functionFilePath))
         {
