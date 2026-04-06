@@ -1,5 +1,7 @@
 IMPORT [js] ifJS
 
+IMPORT [opsl] LoopTest
+
 
 CALL ifJS.ifFunc
 

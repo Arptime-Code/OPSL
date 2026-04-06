@@ -26,11 +26,16 @@ function parseLine(lineInput)
     }
     if(trimmed.startsWith("VARIABLE "))
     {
-        let splitLine = splitBy(trimmed, "VARIABLE ", " = ", ".", '"');
+        let parts = splitBy(trimmed, " = ");
+        let leftSide = parts[0];
+        let rightSide = parts[1];
 
-        let library = splitLine[1];
-        let name = splitLine[2];
-        let value = splitLine[4];
+        let leftParts = splitBy(leftSide, "VARIABLE ", ".");
+        let library = leftParts[1];
+        let name = leftParts[2];
+
+        let valueParts = splitBy(rightSide, '"');
+        let value = valueParts[1];
 
         instruction = {"type" : "VARIABLE", "library" : library, "name" : name, "value" : value};
     }

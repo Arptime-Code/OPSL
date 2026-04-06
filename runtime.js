@@ -26,8 +26,28 @@ class Runtime
     createWorker(library, lang)
     {
         const baseDir = this.getBaseDir();
-        const libDir = path.join(baseDir, "opsl-local", library);
-        const filePath = path.join(libDir, library + ".js");
+        const projectFolder = path.basename(baseDir);
+        
+        let filePath;
+        
+        if(library === projectFolder)
+        {
+            const rootFilePath = path.join(baseDir, library + ".js");
+            if(fs.existsSync(rootFilePath))
+            {
+                filePath = rootFilePath;
+            }
+            else
+            {
+                const libDir = path.join(baseDir, "opsl-local", library);
+                filePath = path.join(libDir, library + ".js");
+            }
+        }
+        else
+        {
+            const libDir = path.join(baseDir, "opsl-local", library);
+            filePath = path.join(libDir, library + ".js");
+        }
         
         let worker;
         if(fs.existsSync(filePath))
