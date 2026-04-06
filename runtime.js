@@ -139,6 +139,13 @@ class Runtime
             return;
         }
 
+        if(instruction.library === "opsl" && instruction.name === "consoleLog")
+        {
+            const message = await globalLibraries["opsl"].getVariable("consoleLog");
+            console.log(message);
+            return;
+        }
+
         const worker = globalLibraries[instruction.library];
         
         if(worker.originalLang === "opsl")

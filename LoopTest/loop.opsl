@@ -18,6 +18,9 @@ VARIABLE ifJS.number = "2"
 CALL ifJS.ifFunc
 
 
+VARIABLE opsl.consoleLog = "Hello World"
+CALL opsl.consoleLog
+
 
 ASSIGN opsl.functionVar = ifJS.output
 CALL opsl.functionCall
