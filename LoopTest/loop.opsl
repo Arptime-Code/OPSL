@@ -1,15 +1,23 @@
+IMPORT [opsl] opsl
 IMPORT [js] ifJS
 
 IMPORT [opsl] LoopTest
 
 
+
+
+
+
+
+VARIABLE ifJS.trueReturn = ""
+VARIABLE ifJS.falseReturn = "LoopTest.loop"
+
+
+VARIABLE ifJS.number = "7"
+
 CALL ifJS.ifFunc
 
-VARIABLE LoopTest.input = "10"
-
-ASSIGN ifJS.input = LoopTest.input
 
 
-CALL ifJS.ifFunc
-
-CALL LoopTest.loop
+ASSIGN opsl.functionVar = ifJS.output
+CALL opsl.functionCall

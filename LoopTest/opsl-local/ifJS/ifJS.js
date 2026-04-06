@@ -1,16 +1,19 @@
-let output = "null";
-let input = "0";
+let output = "";
+let trueReturn = "";
+let falseReturn = "";
+
+let number = "0"
+
 
 
 
 function ifFunc()
 {
-    console.log(input);
-    if(input > 5)
+    console.log(number);
+    if(number > 5)
     {
-        output = "true";
+        output = trueReturn;
     } else {
-        output = "false";
+        output = falseReturn;
     }
-    console.log(output);
 }
