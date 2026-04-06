@@ -1,30 +1,77 @@
 const fs = require("fs");
 const path = require("path");
-const readline = require('readline/promises');
 
 const parser = require("./parser");
 const workerLib = require("./workers");
 const nativeLib = require("./native-library/library");
 
 const globalLibraries = {};
-
 let inputFile = process.argv[2];
 
 class Runtime
 {
-    currentFilePath = null;
     baseFilePath = null;
     importedLibraries = {};
 
-    constructor(currentFilePath = null, baseFilePath = null)
+    constructor(baseFilePath = null)
     {
-        this.currentFilePath = currentFilePath;
-        this.baseFilePath = baseFilePath || currentFilePath;
+        this.baseFilePath = baseFilePath;
     }
 
     getBaseDir()
     {
         return path.dirname(this.baseFilePath);
+    }
+
+    createWorker(library, lang)
+    {
+        const baseDir = this.getBaseDir();
+        const libDir = path.join(baseDir, "opsl-local", library);
+        const filePath = path.join(libDir, library + ".js");
+        
+        let worker;
+        if(fs.existsSync(filePath))
+        {
+            worker = new workerLib.LanguageWorker(lang, filePath);
+        }
+        else
+        {
+            worker = new workerLib.LanguageWorker(lang, undefined);
+        }
+        
+        if(lang === "opsl")
+        {
+            worker.originalLang = "opsl";
+        }
+        
+        return worker;
+    }
+
+    async processOPSLString(fileString)
+    {
+        const lines = fileString.split("\n");
+        
+        for(let i = 0; i < lines.length; i++)
+        {
+            const instruction = parser.parseLine(lines[i]);
+
+            if(instruction.type === "VARIABLE")
+            {
+                await this.handleVariable(instruction);
+            }
+            else if(instruction.type === "ASSIGN")
+            {
+                await this.handleAssign(instruction);
+            }
+            else if(instruction.type === "IMPORT")
+            {
+                await this.handleImport(instruction);
+            }
+            else if(instruction.type === "CALL")
+            {
+                await this.handleCall(instruction);
+            }
+        }
     }
 
     async handleImport(instruction)
@@ -34,132 +81,88 @@ class Runtime
             return;
         }
 
-        const baseDir = this.getBaseDir();
-        
+        globalLibraries[instruction.library] = this.createWorker(instruction.library, instruction.lang);
+
         if(instruction.lang === "opsl")
         {
-            const opslDir = path.join(baseDir, "opsl-local", instruction.library);
-            const jsDir = path.join(baseDir, "opsl-local", instruction.library);
+            const baseDir = this.getBaseDir();
+            const opslFilePath = path.join(baseDir, "opsl-local", instruction.library, instruction.library + ".opsl");
             
-            const jsFilePath = path.join(jsDir, instruction.library + ".js");
-            if(fs.existsSync(jsFilePath))
-            {
-                globalLibraries[instruction.library] = new workerLib.LanguageWorker("js", jsFilePath);
-            }
-            else
-            {
-                globalLibraries[instruction.library] = new workerLib.LanguageWorker("js", undefined);
-            }
-            
-            globalLibraries[instruction.library].originalLang = "opsl";
-
-            const opslFilePath = path.join(opslDir, instruction.library + ".opsl");
             if(fs.existsSync(opslFilePath))
             {
-                const opslFileString = fs.readFileSync(opslFilePath, 'utf8');
-                const nestedRuntime = new Runtime(opslFilePath, this.baseFilePath);
+                const opslFileString = fs.readFileSync(opslFilePath, "utf8");
+                const nestedRuntime = new Runtime(this.baseFilePath);
                 nestedRuntime.importedLibraries = this.importedLibraries;
-                await nestedRuntime.processOPSLString(opslFileString, instruction.library);
-            }
-        }
-        else
-        {
-            const libDir = path.join(baseDir, "opsl-local", instruction.library);
-            const jsFilePath = path.join(libDir, instruction.library + ".js");
-            
-            if(fs.existsSync(jsFilePath))
-            {
-                globalLibraries[instruction.library] = new workerLib.LanguageWorker(instruction.lang, jsFilePath);
-            }
-            else
-            {
-                globalLibraries[instruction.library] = new workerLib.LanguageWorker(instruction.lang, undefined);
+                await nestedRuntime.processOPSLString(opslFileString);
             }
         }
 
         this.importedLibraries[instruction.library] = true;
     }
 
-    async processOPSLString(fileString, libraryName)
+    async handleVariable(instruction)
     {
-        let splitString = fileString.split("\n");
-        
-        for(let y = 0; y < splitString.length; y++)
+        if(this.importedLibraries[instruction.library])
         {
-            let userInput = splitString[y];
-            let instruction = parser.parseLine(userInput);
-
-            if(instruction.type == "VARIABLE")
-            {
-                if(this.importedLibraries[instruction.library])
-                {
-                    const varLang = globalLibraries[instruction.library].language;
-                    await globalLibraries[instruction.library].createVariable(instruction.name, instruction.value);
-                }
-            }
-            if(instruction.type == "ASSIGN")
-            {
-                if(!this.importedLibraries[instruction.library] || !this.importedLibraries[instruction.libraryValue])
-                {
-                    continue;
-                }
-                const libraryLang = globalLibraries[instruction.libraryValue].language;
-                const variableValue = await globalLibraries[instruction.libraryValue].getVariable(instruction.variableValue);
-                const targetLang = globalLibraries[instruction.library].language;
-                await globalLibraries[instruction.library].setVariable(instruction.name, variableValue);
-            }
-            if(instruction.type == "IMPORT")
-            {
-                await this.handleImport(instruction);
-            }
-            if(instruction.type == "CALL")
-            {
-                if(!this.importedLibraries[instruction.library])
-                {
-                    continue;
-                }
-
-                if(instruction.library === "opsl" && instruction.name === "functionCall")
-                {
-                    const functionString = await globalLibraries["opsl"].getVariable("functionVar");
-                    await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries);
-                }
-                else
-                {
-                    const worker = globalLibraries[instruction.library];
-                    
-                    if(worker.originalLang === "opsl")
-                    {
-                        const baseDir = this.getBaseDir();
-                        const libDir = path.join(baseDir, "opsl-local", instruction.library);
-                        const functionFilePath = path.join(libDir, instruction.name + ".opsl");
-                        
-                        if(fs.existsSync(functionFilePath))
-                        {
-                            const functionFileString = fs.readFileSync(functionFilePath, 'utf8');
-                            const nestedRuntime = new Runtime(functionFilePath, this.baseFilePath);
-                            nestedRuntime.importedLibraries = this.importedLibraries;
-                            await nestedRuntime.processOPSLString(functionFileString, instruction.library);
-                        }
-                    }
-                    else
-                    {
-                        await worker.executeFunction(instruction.name);
-                    }
-                }
-            }
+            await globalLibraries[instruction.library].createVariable(instruction.name, instruction.value);
         }
     }
 
-    async inputMode(fileString, libraryName)
+    async handleAssign(instruction)
     {
-        await this.processOPSLString(fileString, libraryName);
+        if(!this.importedLibraries[instruction.library] || !this.importedLibraries[instruction.libraryValue])
+        {
+            return;
+        }
+
+        const variableValue = await globalLibraries[instruction.libraryValue].getVariable(instruction.variableValue);
+        await globalLibraries[instruction.library].setVariable(instruction.name, variableValue);
+    }
+
+    async handleCall(instruction)
+    {
+        if(!this.importedLibraries[instruction.library])
+        {
+            return;
+        }
+
+        if(instruction.library === "opsl" && instruction.name === "functionCall")
+        {
+            const functionString = await globalLibraries["opsl"].getVariable("functionVar");
+            await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries);
+            return;
+        }
+
+        const worker = globalLibraries[instruction.library];
+        
+        if(worker.originalLang === "opsl")
+        {
+            await this.executeOPSLFunction(instruction.library, instruction.name);
+        }
+        else
+        {
+            await worker.executeFunction(instruction.name);
+        }
+    }
+
+    async executeOPSLFunction(library, name)
+    {
+        const baseDir = this.getBaseDir();
+        const libDir = path.join(baseDir, "opsl-local", library);
+        const functionFilePath = path.join(libDir, name + ".opsl");
+        
+        if(fs.existsSync(functionFilePath))
+        {
+            const functionFileString = fs.readFileSync(functionFilePath, "utf8");
+            const nestedRuntime = new Runtime(this.baseFilePath);
+            nestedRuntime.importedLibraries = this.importedLibraries;
+            await nestedRuntime.processOPSLString(functionFileString);
+        }
     }
 }
 
 const runtime = new Runtime(inputFile);
-let inputFileString = fs.readFileSync(inputFile, 'utf8');
-let libraryName = inputFile.split("/")[inputFile.split("/").length - 2];
-console.log( fs.readFileSync(inputFile, 'utf8'));
-runtime.inputMode(inputFileString, libraryName);
-console.log("hi");
+const inputFileString = fs.readFileSync(inputFile, "utf8");
+(async function() {
+    await runtime.processOPSLString(inputFileString);
+})();

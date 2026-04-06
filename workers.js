@@ -13,12 +13,12 @@ class LanguageWorker {
 
         this.context = vm.createContext({
             console: {
-                log: function(...args) {
+                log: (...args) => {
                     this.capturedOutput = args.join(" ");
                     console.log(...args);
                 },
-                error: function() { console.error.apply(console, arguments); },
-                warn: function() { console.warn.apply(console, arguments); }
+                error: (...args) => console.error(...args),
+                warn: (...args) => console.warn(...args),
             },
             setTimeout: setTimeout,
             setInterval: setInterval,
