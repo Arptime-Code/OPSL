@@ -1,3 +1,0 @@
-IMPORT [js] greeting
-
-CALL greeting.showMessage
