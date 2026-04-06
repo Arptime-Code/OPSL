@@ -1,0 +1,25 @@
+{
+  "name": "opsl-language",
+  "displayName": "OPSL Language",
+  "description": "Syntax highlighting for OPSL files",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "opsl",
+      "aliases": ["OPSL"],
+      "extensions": [".opsl"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "opsl",
+      "scopeName": "source.opsl",
+      "path": "./syntaxes/opsl.tmLanguage.json"
+    }]
+  }
+}

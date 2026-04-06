@@ -1,0 +1,58 @@
+{
+  "name": "opsl",
+  "scopeName": "source.opsl",
+  "patterns": [{ "include": "#main" }],
+  "repository": {
+    "main": {
+      "patterns": [
+        { "include": "#keywords" },
+        { "include": "#import-name" },
+        { "include": "#brackets" },
+        { "include": "#strings" },
+        { "include": "#assignments" },
+        { "include": "#dotted" },
+        { "include": "#identifiers" },
+        { "include": "#comments" }
+      ]
+    },
+    "keywords": {
+      "match": "\\b(IMPORT|VARIABLE|ASSIGN|CALL)\\b",
+      "name": "keyword.control.$1.opsl"
+    },
+    "import-name": {
+      "name": "entity.name.namespace.opsl",
+      "match": "(?<=\\]\\s+)[a-zA-Z_][a-zA-Z0-9_]*\\b"
+    },
+    "brackets": {
+      "match": "\\[([a-zA-Z]+)\\]",
+      "captures": {
+        "1": { "name": "entity.name.tag.opsl" }
+      }
+    },
+    "strings": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.opsl",
+      "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.opsl" }]
+    },
+    "assignments": {
+      "match": "\\s*=\\s*",
+      "name": "keyword.operator.assignment.opsl"
+    },
+    "dotted": {
+      "match": "([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\.\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
+      "captures": {
+        "1": { "name": "entity.name.namespace.opsl" },
+        "2": { "name": "variable.property.opsl" }
+      }
+    },
+    "identifiers": {
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+      "name": "variable.other.opsl"
+    },
+    "comments": {
+      "match": "//.*",
+      "name": "comment.line.double-slash.opsl"
+    }
+  }
+}
