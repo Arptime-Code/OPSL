@@ -30,7 +30,7 @@ function parseLine(lineInput)
 
         let library = splitLine[1];
         let name = splitLine[2];
-        let value = splitLine[4] + "." + splitLine[5];
+        let value = splitLine[4];
 
         instruction = {"type" : "VARIABLE", "library" : library, "name" : name, "value" : value};
     }

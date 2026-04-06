@@ -1,0 +1,11 @@
+IMPORT [js] ifJS
+
+
+CALL ifJS.ifFunc
+
+VARIABLE LoopTest.input = "10"
+
+ASSIGN ifJS.input = LoopTest.input
+
+
+CALL ifJS.ifFunc

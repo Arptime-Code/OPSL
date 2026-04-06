@@ -83,20 +83,6 @@ class Runtime
 
         globalLibraries[instruction.library] = this.createWorker(instruction.library, instruction.lang);
 
-        if(instruction.lang === "opsl")
-        {
-            const baseDir = this.getBaseDir();
-            const opslFilePath = path.join(baseDir, "opsl-local", instruction.library, instruction.library + ".opsl");
-            
-            if(fs.existsSync(opslFilePath))
-            {
-                const opslFileString = fs.readFileSync(opslFilePath, "utf8");
-                const nestedRuntime = new Runtime(this.baseFilePath);
-                nestedRuntime.importedLibraries = this.importedLibraries;
-                await nestedRuntime.processOPSLString(opslFileString);
-            }
-        }
-
         this.importedLibraries[instruction.library] = true;
     }
 

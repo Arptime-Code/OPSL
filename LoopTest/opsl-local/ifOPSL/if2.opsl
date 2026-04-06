@@ -1,0 +1,3 @@
+IMPORT [opsl] ifOPSL
+
+VARIABLE ifOPSL.input = "10"
