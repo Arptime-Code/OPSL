@@ -132,10 +132,10 @@ class Runtime
             return;
         }
 
-        if(instruction.library === "opsl" && instruction.name === "functionCall")
+            if(instruction.library === "opsl" && instruction.name === "functionCall")
         {
             const functionString = await globalLibraries["opsl"].getVariable("functionVar");
-            await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries);
+            await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries, this.baseFilePath);
             return;
         }
 
@@ -183,8 +183,17 @@ class Runtime
     }
 }
 
+
+
 const runtime = new Runtime(inputFile);
 const inputFileString = fs.readFileSync(inputFile, "utf8");
 (async function() {
     await runtime.processOPSLString(inputFileString);
 })();
+
+
+
+
+
+
+module.exports = { Runtime };

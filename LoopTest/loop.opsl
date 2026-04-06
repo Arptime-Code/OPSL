@@ -13,7 +13,7 @@ VARIABLE ifJS.trueReturn = ""
 VARIABLE ifJS.falseReturn = "LoopTest.loop"
 
 
-VARIABLE ifJS.number = "7"
+VARIABLE ifJS.number = "2"
 
 CALL ifJS.ifFunc
 

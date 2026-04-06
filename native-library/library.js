@@ -1,11 +1,8 @@
-const fs = require("fs");
-const path = require("path");
-
-const Runtime = require("../runtime");
+const { Runtime } = require("../runtime");
 
 class NativeOPSL
 {
-    async callFunction(functionString, globalLibraries, importedLibraries)
+    async callFunction(functionString, globalLibraries, importedLibraries, baseFilePath)
     {
         const parts = functionString.split(".");
         const libraryName = parts[0];
@@ -25,29 +22,14 @@ class NativeOPSL
         
         if(worker.originalLang === "opsl")
         {
-            await this.executeOPSLFunction(libraryName, functionName, importedLibraries);
+            const runtime = new Runtime(baseFilePath);
+            runtime.importedLibraries = importedLibraries;
+            await runtime.executeOPSLFunction(libraryName, functionName);
         }
         else
         {
             await worker.executeFunction(functionName);
         }
-    }
-
-    async executeOPSLFunction(libraryName, functionName, importedLibraries)
-    {
-        const baseDir = path.dirname(require.main.filename);
-        const libDir = path.join(baseDir, "opsl-local", libraryName);
-        const functionFilePath = path.join(libDir, functionName + ".opsl");
-        
-        if(!fs.existsSync(functionFilePath))
-        {
-            return;
-        }
-        
-        const functionFileString = fs.readFileSync(functionFilePath, "utf8");
-        const nestedRuntime = new Runtime(functionFilePath);
-        nestedRuntime.importedLibraries = importedLibraries;
-        await nestedRuntime.processOPSLString(functionFileString);
     }
 }
 
