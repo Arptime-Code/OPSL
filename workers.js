@@ -42,8 +42,13 @@ class LanguageWorker {
     }
 
     createVariable(variableName, value) {
-        const code = this.config.variableCreate.replace("variable", variableName).replace("value", value);
-        vm.runInContext(code, this.context);
+        try {
+            const code = this.config.variableCreate.replace("variable", variableName).replace("value", value);
+            vm.runInContext(code, this.context);
+        } catch(e) {
+            const code = this.config.variableSet.replace("variable", variableName).replace("value", value);
+            vm.runInContext(code, this.context);
+        }
     }
 
     getVariable(variableName) {
