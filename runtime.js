@@ -135,7 +135,7 @@ class Runtime
             if(instruction.library === "opsl" && instruction.name === "functionCall")
         {
             const functionString = await globalLibraries["opsl"].getVariable("functionVar");
-            await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries, this.baseFilePath);
+            await nativeLib.callFunction(functionString, globalLibraries, this.importedLibraries, this.executeOPSLFunction.bind(this));
             return;
         }
 

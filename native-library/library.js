@@ -1,8 +1,6 @@
-const { Runtime } = require("../runtime");
-
 class NativeOPSL
 {
-    async callFunction(functionString, globalLibraries, importedLibraries, baseFilePath)
+    async callFunction(functionString, globalLibraries, importedLibraries, executeOPSLFunction)
     {
         const parts = functionString.split(".");
         const libraryName = parts[0];
@@ -22,9 +20,7 @@ class NativeOPSL
         
         if(worker.originalLang === "opsl")
         {
-            const runtime = new Runtime(baseFilePath);
-            runtime.importedLibraries = importedLibraries;
-            await runtime.executeOPSLFunction(libraryName, functionName);
+            await executeOPSLFunction(libraryName, functionName);
         }
         else
         {
