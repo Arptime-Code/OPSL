@@ -5,7 +5,7 @@ IMPORT [js] ifJS
 IMPORT [js] add
 
 
-//Add code to say what code to actually repeatedly execute in the loop and mak that the VARIABLE of this library
+//Add code to say what code to actually repeatedly execute in the loop and make that the VARIABLE of this library
 
 
 

@@ -10,7 +10,7 @@ let number = "0"
 function ifFunc()
 {
     console.log(number);
-    if(number > 5)
+    if(number > 1000)
     {
         output = trueReturn;
     } else {
