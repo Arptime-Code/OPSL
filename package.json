@@ -4,7 +4,8 @@
   "description": "One Programming Language - Multi-language execution framework with TCP-based inter-process communication",
   "main": "runtimeTCP/main.js",
   "bin": {
-    "opsl": "./bin/opsl-cli.js"
+    "opsl": "./bin/opsl-cli.js",
+    "opslpm": "./opslPM/opslpm-cli.js"
   },
   "files": [
     "bin/",
