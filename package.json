@@ -1,0 +1,24 @@
+{
+  "name": "opsl",
+  "version": "1.0.0",
+  "description": "One Programming Language - Multi-language execution framework with TCP-based inter-process communication",
+  "main": "runtimeTCP/main.js",
+  "bin": {
+    "opsl": "./bin/opsl-cli.js"
+  },
+  "files": [
+    "bin/",
+    "runtimeTCP/",
+    "tcp-server-v3/",
+    "tcp-workers.js",
+    "tcp-socket.js",
+    "request-tracker.js",
+    "process-spawner.js",
+    "parser.js",
+    "native-library/",
+    "languages/",
+    "config.json"
+  ],
+  "keywords": ["opsl", "scripting", "multi-language", "tcp"],
+  "license": "MIT"
+}

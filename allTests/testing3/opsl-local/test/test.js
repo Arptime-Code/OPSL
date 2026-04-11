@@ -1,27 +1,22 @@
 // ========================================
 // test.js - TCP-enabled library
-// Uses tcp-server-v3 client
+// Uses opsl-tcp-client (globally installed npm package)
 // ========================================
 
-const TCPClient = require('/home/arptime/Main_Programming/OPSL (Copy 2)/tcp-server-v3/client');
+var TCPClient = require('opsl-tcp-client');
 
-// Define functions
+// Functions — no parameters
 function sayHello() {
     console.log("Hello from function!");
     return "hello executed";
 }
 
-var thisString = "56783";
-var hellio = "10";
-var hellioString = "164380";
-
-// Initialize and register
+// Initialize — OS assigns port automatically
 (async () => {
-    await TCPClient.init('test', 4002);
+    await TCPClient.init('test');
     await TCPClient.registerFunction('sayHello', sayHello);
-    await TCPClient.set('thisString', thisString);
-    await TCPClient.set('hellio', hellio);
-    await TCPClient.set('hellioString', hellioString);
+    await TCPClient.set('thisString', '56783');
+    await TCPClient.set('hellio', '10');
+    await TCPClient.set('hellioString', '164380');
     console.log("test.js loaded and registered");
 })();
-

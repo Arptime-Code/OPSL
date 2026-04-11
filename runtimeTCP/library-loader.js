@@ -3,11 +3,13 @@
 // Finds library files on disk and creates workers
 // ========================================
 
-const fs = require('fs');
-const path = require('path');
-const tcpWorkerLib = require('../tcp-workers');
+var fs = require('fs');
+var path = require('path');
+var tcpWorkerLib = require('../tcp-workers');
 
+// ========================================
 // Find the full file path for a library by name
+// ========================================
 function findLibraryPath(baseFilePath, libraryName) {
     var baseDir = path.dirname(baseFilePath);
     var projectFolder = path.basename(baseDir);
@@ -29,7 +31,9 @@ function findLibraryPath(baseFilePath, libraryName) {
     return null;
 }
 
+// ========================================
 // Create a TCP worker for a library
+// ========================================
 async function loadLibrary(baseFilePath, libraryName, language) {
     var filePath = findLibraryPath(baseFilePath, libraryName);
     var worker = await tcpWorkerLib.createWorker(language, libraryName, filePath);

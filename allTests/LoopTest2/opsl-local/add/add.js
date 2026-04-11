@@ -1,29 +1,24 @@
 // ========================================
 // add.js - TCP-enabled library
-// Uses tcp-server-v3 client
+// Uses opsl-tcp-client (globally installed npm package)
 // ========================================
 
-const TCPClient = require('/home/arptime/Main_Programming/OPSL (Copy 2)/tcp-server-v3/client');
+var TCPClient = require('opsl-tcp-client');
 
-let number = "0"
-let output = "0"
-
+// Functions have NO parameters — just execute and return
 async function add() {
-    // Get current number from TCP server
-    number = await TCPClient.get('number');
-    number = String(Number(number) + 1)
-    output = number
-    
-    // Update variables on TCP server so they're globally accessible
+    var number = await TCPClient.get('number');
+    number = String(Number(number) + 1);
     await TCPClient.set('number', number);
-    await TCPClient.set('output', output);
+    await TCPClient.set('output', number);
+    return number;
 }
 
-// Initialize and register
+// Initialize — OS assigns port automatically
 (async () => {
-    await TCPClient.init('add', 4010);
+    await TCPClient.init('add');
     await TCPClient.registerFunction('add', add);
-    await TCPClient.set('number', number);
-    await TCPClient.set('output', output);
+    await TCPClient.set('number', '0');
+    await TCPClient.set('output', '0');
     console.log("add.js loaded and registered");
 })();

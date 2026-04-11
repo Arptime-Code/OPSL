@@ -1,20 +1,19 @@
 // ========================================
 // greeting.js - TCP-enabled library
-// Uses tcp-server-v3 client
+// Uses opsl-tcp-client (globally installed npm package)
 // ========================================
 
-const TCPClient = require('/home/arptime/Main_Programming/OPSL (Copy 2)/tcp-server-v3/client');
+var TCPClient = require('opsl-tcp-client');
 
-// Define functions
+// Functions — no parameters
 function showMessage() {
     console.log("Greeting function executed!");
     return "message shown";
 }
 
-// Initialize and register
+// Initialize — OS assigns port automatically
 (async () => {
-    await TCPClient.init('greeting', 4003);
+    await TCPClient.init('greeting');
     await TCPClient.registerFunction('showMessage', showMessage);
     console.log("greeting.js loaded and registered");
 })();
-

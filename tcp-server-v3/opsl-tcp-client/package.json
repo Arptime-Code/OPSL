@@ -1,0 +1,8 @@
+{
+  "name": "opsl-tcp-client",
+  "version": "1.0.0",
+  "description": "TCP client library for OPSL - enables libraries to communicate with the OPSL TCP server",
+  "main": "index.js",
+  "keywords": ["opsl", "tcp", "client"],
+  "license": "MIT"
+}

@@ -3,13 +3,13 @@
 // The Runtime class — ties all modules together
 // ========================================
 
-const path = require('path');
-const parser = require('../parser');
-const libraryLoader = require('./library-loader');
-const instructionHandler = require('./instruction-handler');
-const opslExecutor = require('./opsl-executor');
+var path = require('path');
+var parser = require('../parser');
+var libraryLoader = require('./library-loader');
+var instructionHandler = require('./instruction-handler');
+var opslExecutor = require('./opsl-executor');
 
-// Shared state (used by instruction-handler and cleanup)
+// Shared state
 var globalLibraries = instructionHandler.globalLibraries;
 
 function Runtime(baseFilePath) {
@@ -17,12 +17,10 @@ function Runtime(baseFilePath) {
     this.importedLibraries = {};
 }
 
-// Get directory of the current .opsl file
 Runtime.prototype.getBaseDir = function () {
     return path.dirname(this.baseFilePath);
 };
 
-// Create a worker for a library (delegated to library-loader)
 Runtime.prototype.createWorker = function (libraryName, language) {
     return libraryLoader.loadLibrary(this.baseFilePath, libraryName, language);
 };
@@ -30,33 +28,83 @@ Runtime.prototype.createWorker = function (libraryName, language) {
 // Walk through every line of the .opsl file and execute it
 Runtime.prototype.processOPSLString = async function (fileString) {
     var lines = fileString.split('\n');
+    var self = this;
 
     for (var i = 0; i < lines.length; i++) {
         var instruction = parser.parseLine(lines[i]);
 
         switch (instruction.type) {
             case 'IMPORT':
-                await instructionHandler.handleImport(instruction, this);
+                if (!self.importedLibraries[instruction.library]) {
+                    console.log('Importing library: ' + instruction.library + ' (' + instruction.lang + ')');
+                    var worker = await self.createWorker(instruction.library, instruction.lang);
+                    globalLibraries[instruction.library] = worker;
+                    self.importedLibraries[instruction.library] = true;
+                }
                 break;
+
             case 'VARIABLE':
-                await instructionHandler.handleVariable(instruction, this);
+                if (self.importedLibraries[instruction.library]) {
+                    var w = globalLibraries[instruction.library];
+                    await instructionHandler.setVariable(w, instruction.name, instruction.value);
+                }
                 break;
+
             case 'ASSIGN':
-                await instructionHandler.handleAssign(instruction, this);
+                if (self.importedLibraries[instruction.library] && self.importedLibraries[instruction.libraryValue]) {
+                    var src = globalLibraries[instruction.libraryValue];
+                    var tgt = globalLibraries[instruction.library];
+                    if (src.originalLang !== 'opsl') {
+                        var val = await instructionHandler.getVariable(src, instruction.variableValue);
+                        await instructionHandler.setVariable(tgt, instruction.name, val);
+                    }
+                }
                 break;
+
             case 'CALL':
-                await instructionHandler.handleCall(instruction, this);
+                if (self.importedLibraries[instruction.library]) {
+                    await self.handleCall(instruction);
+                }
                 break;
         }
     }
 };
 
-// Execute a nested .opsl file (delegated to opsl-executor)
+// Handle CALL instruction inline
+Runtime.prototype.handleCall = async function (instruction) {
+    var worker = globalLibraries[instruction.library];
+
+    // Special: dynamic function call
+    if (instruction.library === 'opsl' && instruction.name === 'functionCall') {
+        var functionString = await instructionHandler.getVariable(worker, 'functionVar');
+        if (functionString && functionString.trim()) {
+            var parts = functionString.split('.');
+            if (parts.length === 2) {
+                await this.executeOPSLFunction(parts[0], parts[1]);
+            }
+        }
+        return;
+    }
+
+    // Special: console log
+    if (instruction.library === 'opsl' && instruction.name === 'consoleLog') {
+        var message = await instructionHandler.getVariable(worker, 'consoleLog');
+        console.log(message);
+        return;
+    }
+
+    // OPSL → nested .opsl; JS → TCP function call
+    if (worker.originalLang === 'opsl') {
+        await this.executeOPSLFunction(instruction.library, instruction.name);
+    } else {
+        await instructionHandler.executeFunction(worker, instruction.name);
+    }
+};
+
 Runtime.prototype.executeOPSLFunction = function (library, name) {
     return opslExecutor.executeOPSLFunction(this, library, name);
 };
 
-// Expose global libraries for cleanup
 Runtime.prototype.getGlobalLibraries = function () {
     return globalLibraries;
 };

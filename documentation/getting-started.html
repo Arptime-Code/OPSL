@@ -161,34 +161,34 @@ OPSL execution completed successfully</div>
 
     <div class="card">
       <h3>Library Template</h3>
-      <div class="code-block">// 1. Require the TCP client library
-const TCPClient = require('/absolute/path/to/tcp-server-v3/client');
+      <div class="code-block">// 1. Require the TCP client (global npm package — no path needed!)
+const TCPClient = require('opsl-tcp-client');
 
-// 2. Define your functions normally
+// 2. Define your functions — NO PARAMETERS allowed
 function myFunction() {
+    // Read current state from TCP server
     console.log("Hello!");
     return "result";
 }
 
-// 3. Define variables
-var myVariable = "initial value";
-
-// 4. Initialize, register, and signal ready
+// 3. Set variables directly — no intermediate local vars
+// 4. Initialize — NO PORT NEEDED, OS assigns one automatically
 (async () => {
-    await TCPClient.init('libraryName', uniquePort);
+    await TCPClient.init('libraryName');  // Auto port!
+    await TCPClient.set('myVariable', 'Hello World');
     await TCPClient.registerFunction('myFunction', myFunction);
-    await TCPClient.set('myVariable', myVariable);
     console.log("loaded and registered");
 })();</div>
     </div>
 
     <h4>Key rules:</h4>
     <ul>
-      <li><strong>Each library needs a unique port</strong> — start at 4001 and increment (4002, 4003, etc.)</li>
+      <li><strong>No port needed</strong> — <code>TCPClient.init('name')</code> only. The OS assigns a free port automatically via <code>listen(0)</code>.</li>
       <li><strong>Register every function</strong> you want other libraries or OPSL scripts to call</li>
-      <li><strong>Set initial variables</strong> with <code>TCPClient.set()</code></li>
+      <li><strong>Set initial variables</strong> with <code>TCPClient.set()</code> — no intermediate local variables needed</li>
       <li><strong>Print "loaded and registered"</strong> — the runtime waits for this exact string</li>
-      <li><strong>Use absolute paths</strong> in the <code>require()</code> — relative paths won't work because libraries run from their own directories</li>
+      <li><strong>No function parameters</strong> — functions are called with zero arguments. Read state from the TCP server with <code>TCPClient.get()</code>.</li>
+      <li><strong>Use <code>require('opsl-tcp-client')</code></strong> — a globally installed npm package, no path resolution needed</li>
     </ul>
 
     <h4>Updating variables inside functions:</h4>
@@ -262,42 +262,35 @@ ASSIGN opsl.functionVar = ifJS.output
 CALL opsl.functionCall</div>
 
     <h4>opsl-local/add/add.js</h4>
-    <div class="code-block">const TCPClient = require('.../tcp-server-v3/client');
-
-let number = "0"
-let output = "0"
+    <div class="code-block">const TCPClient = require('opsl-tcp-client');
 
 async function add() {
-    number = await TCPClient.get('number');
-    number = String(Number(number) + 1)
-    output = number
+    var number = await TCPClient.get('number');
+    number = String(Number(number) + 1);
     await TCPClient.set('number', number);
-    await TCPClient.set('output', output);
+    await TCPClient.set('output', number);
+    return number;
 }
 
 (async () => {
-    await TCPClient.init('add', 4010);
+    await TCPClient.init('add');  // No port!
     await TCPClient.registerFunction('add', add);
-    await TCPClient.set('number', number);
-    await TCPClient.set('output', output);
+    await TCPClient.set('number', '0');
+    await TCPClient.set('output', '0');
     console.log("add.js loaded and registered");
 })();</div>
 
     <h4>opsl-local/ifJS/ifJS.js</h4>
-    <div class="code-block">const TCPClient = require('.../tcp-server-v3/client');
-
-let output = "LoopTest.loop";
-let trueReturn = "";
-let falseReturn = "LoopTest.loop";
-let number = "0"
+    <div class="code-block">const TCPClient = require('opsl-tcp-client');
 
 async function ifFunc() {
-    number = await TCPClient.get('number');
-    trueReturn = await TCPClient.get('trueReturn');
-    falseReturn = await TCPClient.get('falseReturn');
+    var number = await TCPClient.get('number');
+    var trueReturn = await TCPClient.get('trueReturn');
+    var falseReturn = await TCPClient.get('falseReturn');
 
     console.log(number);
-    if(Number(number) > 1000) {
+    var output;
+    if (Number(number) > 1000) {
         output = trueReturn;
     } else {
         output = falseReturn;
@@ -307,12 +300,12 @@ async function ifFunc() {
 }
 
 (async () => {
-    await TCPClient.init('ifJS', 4011);
+    await TCPClient.init('ifJS');  // No port!
     await TCPClient.registerFunction('ifFunc', ifFunc);
-    await TCPClient.set('output', output);
-    await TCPClient.set('trueReturn', trueReturn);
-    await TCPClient.set('falseReturn', falseReturn);
-    await TCPClient.set('number', number);
+    await TCPClient.set('output', 'LoopTest.loop');
+    await TCPClient.set('trueReturn', '');
+    await TCPClient.set('falseReturn', 'LoopTest.loop');
+    await TCPClient.set('number', '0');
     console.log("ifJS.js loaded and registered");
 })();</div>
 

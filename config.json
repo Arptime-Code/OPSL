@@ -1,0 +1,17 @@
+{
+  "server": {
+    "port": 3000,
+    "startup_wait_ms": 500,
+    "connection_timeout_ms": 1000
+  },
+  "workers": {
+    "ready_timeout_ms": 5000,
+    "ready_marker": "loaded and registered"
+  },
+  "parser": {
+    "import_keyword": "IMPORT ",
+    "assign_keyword": "ASSIGN ",
+    "variable_keyword": "VARIABLE ",
+    "call_keyword": "CALL "
+  }
+}

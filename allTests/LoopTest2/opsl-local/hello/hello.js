@@ -5,13 +5,14 @@
 
 var TCPClient = require('opsl-tcp-client');
 
-// Define functions — no parameters
+// Define functions — no parameters allowed
 function greet() {
     console.log("Hello from greeting! TCP communication is working.");
     return "greet executed";
 }
 
-// Initialize — OS assigns port automatically
+// Initialize — no port needed, OS assigns one automatically
+// Variables set directly, no intermediate local vars
 (async () => {
     await TCPClient.init('hello');
     await TCPClient.registerFunction('greet', greet);

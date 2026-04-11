@@ -3,11 +3,13 @@
 // Converts OPSL instruction lines into structured objects
 // ========================================
 
+var config = require('./config.json');
+
 // Configuration: keywords recognized by the parser
-var IMPORT_KEYWORD = 'IMPORT ';
-var ASSIGN_KEYWORD = 'ASSIGN ';
-var VARIABLE_KEYWORD = 'VARIABLE ';
-var CALL_KEYWORD = 'CALL ';
+var IMPORT_KEYWORD = config.parser.import_keyword;
+var ASSIGN_KEYWORD = config.parser.assign_keyword;
+var VARIABLE_KEYWORD = config.parser.variable_keyword;
+var CALL_KEYWORD = config.parser.call_keyword;
 
 // Configuration: delimiter sets for each instruction type
 var IMPORT_DELIMS = [' ', '[', ']'];

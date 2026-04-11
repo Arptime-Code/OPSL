@@ -3,14 +3,17 @@
 // Starts, checks, and stops the TCP server
 // ========================================
 
-const { spawn } = require('child_process');
-const net = require('net');
-const path = require('path');
+var { spawn } = require('child_process');
+var net = require('net');
+var path = require('path');
+var config = require('../config.json');
 
-var SERVER_PORT = 3000;
-var STARTUP_WAIT = 500;
+var SERVER_PORT = config.server.port;
+var STARTUP_WAIT = config.server.startup_wait_ms;
 
-// Check if something is already listening on port 3000
+// ========================================
+// Check if something is already listening on the server port
+// ========================================
 function isServerRunning() {
     return new Promise(function (resolve) {
         var socket = net.connect(SERVER_PORT, function () {
@@ -23,11 +26,13 @@ function isServerRunning() {
         setTimeout(function () {
             socket.end();
             resolve(false);
-        }, 500);
+        }, config.server.connection_timeout_ms);
     });
 }
 
+// ========================================
 // Start the TCP server as a child process
+// ========================================
 function startServer() {
     return new Promise(function (resolve) {
         var serverPath = path.join(__dirname, '..', 'tcp-server-v3', 'server', 'index.js');
@@ -47,7 +52,9 @@ function startServer() {
     });
 }
 
+// ========================================
 // Kill the server process
+// ========================================
 function stopServer(serverProcess) {
     if (!serverProcess) return;
     try {
