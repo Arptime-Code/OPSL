@@ -1,0 +1,29 @@
+IMPORT [opsl] LoopTest
+IMPORT [opsl] opsl
+
+IMPORT [js] ifJS
+IMPORT [js] add
+
+
+//Add code to say what code to actually repeatedly execute in the loop and make that the VARIABLE of this library
+
+
+
+
+VARIABLE ifJS.trueReturn = ""
+VARIABLE ifJS.falseReturn = "LoopTest.loop"
+ASSIGN ifJS.number = add.output
+
+CALL ifJS.ifFunc
+
+
+ASSIGN opsl.consoleLog = ifJS.number
+CALL opsl.consoleLog
+
+
+ASSIGN add.number = ifJS.number
+CALL add.add
+
+
+ASSIGN opsl.functionVar = ifJS.output
+CALL opsl.functionCall

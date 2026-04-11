@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPSL Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--cyan:#06b6d4;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;min-width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--accent)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;transition:border-color 0.2s}
+.card:hover{border-color:rgba(59,130,246,0.3)}
+.card h3{margin-top:0}
+.card p{margin-bottom:0}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre;color:#e6edf3}
+.code-block .kw{color:#ff7b72}.code-block .str{color:#a5d6ff}.code-block .cm{color:#8b949e;font-style:italic}.code-block .fn{color:#d2a8ff}.code-block .num{color:#79c0ff}
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.note strong{color:var(--accent)}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--accent)}
+.badge-green{background:rgba(34,197,94,0.15);color:var(--green)}
+.badge-purple{background:rgba(168,85,247,0.15);color:var(--purple)}
+.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.flow-step{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 14px;min-width:120px}
+.flow-step .n{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.flow-step h4{font-size:12px;font-weight:600;margin-bottom:2px}
+.flow-step p{font-size:10px;color:var(--text2);margin:0}
+.flow-arrow{color:var(--text2);font-size:16px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html" class="active">Home</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="tcp-system.html">TCP System</a>
+  <a href="api-reference.html">API Reference</a>
+  <a href="code-walkthrough.html">Code Walkthrough</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html" class="active">Home</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="tcp-system.html">TCP System</a>
+    <a href="api-reference.html">API Reference</a>
+    <a href="code-walkthrough.html">Code Walkthrough</a>
+    <h3>Project Files</h3>
+    <a href="code-walkthrough.html#parser">parser.js</a>
+    <a href="code-walkthrough.html#workers">tcp-workers.js</a>
+    <a href="code-walkthrough.html#runtime">runtimeTCP/</a>
+    <a href="code-walkthrough.html#server">tcp-server-v3/</a>
+    <a href="code-walkthrough.html#native">native-library/</a>
+    <h3>Quick Links</h3>
+    <a href="getting-started.html#install">Installation</a>
+    <a href="getting-started.html#first-script">First Script</a>
+    <a href="tcp-system.html#flow">Message Flow</a>
+    <a href="api-reference.html#tcpclient">TCPClient API</a>
+  </div>
+  <div id="content">
+    <h1>OPSL Documentation</h1>
+    <p class="subtitle">Complete guide to a multi-language execution framework with TCP-based inter-process communication</p>
+
+    <div class="flow">
+      <div class="flow-step"><div class="n">STEP 1</div><h4>Write .opsl</h4><p>Custom DSL instructions</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 2</div><h4>Parse</h4><p>Text → structured objects</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 3</div><h4>Execute</h4><p>Runtime orchestrates</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 4</div><h4>TCP Server</h4><p>Routes messages</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">STEP 5</div><h4>Libraries</h4><p>Execute in isolation</p></div>
+    </div>
+
+    <h2>What is OPSL?</h2>
+    <p>OPSL (One Programming/Scripting Language) is a framework that lets you write scripts in a <strong>custom domain-specific language</strong> (.opsl files) that orchestrate code execution across <strong>multiple programming languages</strong> — JavaScript, Python, C, and even other OPSL files. Instead of choosing one language, you use them all together.</p>
+    <p>Each library runs as its own <strong>isolated Node.js process</strong>, communicating with others through a <strong>central TCP server</strong> on port 3000. This provides process isolation, scalability, and the ability to distribute libraries across different machines.</p>
+
+    <h2>Documentation Structure</h2>
+    <div class="card">
+      <h3><a href="getting-started.html">🚀 Getting Started</a> <span class="badge badge-green">Beginner</span></h3>
+      <p>Installation, your first OPSL script, how to write TCP-enabled libraries, and the basic workflow. Start here if you're new to OPSL.</p>
+    </div>
+    <div class="card">
+      <h3><a href="architecture.html">🏗️ Architecture</a> <span class="badge badge-blue">Intermediate</span></h3>
+      <p>How the system is organized: the 6 major subsystems, how they connect, and the data flow from a .opsl file to actual code execution.</p>
+    </div>
+    <div class="card">
+      <h3><a href="tcp-system.html">🌐 TCP Communication System</a> <span class="badge badge-blue">Intermediate</span></h3>
+      <p>Deep dive into the TCP server, client library, message protocol, persistent sockets, and how libraries communicate across processes.</p>
+    </div>
+    <div class="card">
+      <h3><a href="api-reference.html">📖 API Reference</a> <span class="badge badge-purple">Reference</span></h3>
+      <p>Complete reference for TCPClient API, OPSL instructions, configuration variables, and file structure.</p>
+    </div>
+    <div class="card">
+      <h3><a href="code-walkthrough.html">💻 Code Walkthrough</a> <span class="badge badge-purple">Advanced</span></h3>
+      <p>Line-by-line explanation of every source file in the project. For developers who want to understand the implementation details.</p>
+    </div>
+
+    <h2>Quick Example</h2>
+    <p>Here's what an OPSL script looks like:</p>
+    <div class="code-block">IMPORT [js] test
+IMPORT [js] greeting
+
+VARIABLE test.myVar = "hello"
+CALL test.sayHello
+CALL greeting.showMessage</div>
+
+    <p>And here's what a TCP-enabled JavaScript library looks like:</p>
+    <div class="code-block">const TCPClient = require('tcp-server-v3/client');
+
+function sayHello() {
+    console.log("Hello!");
+}
+
+(async () => {
+    await TCPClient.init('test', 4001);
+    await TCPClient.registerFunction('sayHello', sayHello);
+    await TCPClient.set('myVar', 'initial');
+    console.log("loaded and registered");
+})();</div>
+
+    <div class="note">
+      <strong>Performance:</strong> The system executes ~0.06ms per instruction thanks to persistent TCP sockets. A 1000-iteration loop completes in ~0.7 seconds.
+    </div>
+
+    <h2>Project Structure</h2>
+    <table>
+      <tr><th>File / Folder</th><th>Purpose</th></tr>
+      <tr><td><code>parser.js</code></td><td>Parses OPSL text into instruction objects</td></tr>
+      <tr><td><code>tcp-workers.js</code></td><td>Manages persistent TCP socket + spawns library processes</td></tr>
+      <tr><td><code>runtimeTCP/</code></td><td>7 modular files that orchestrate execution</td></tr>
+      <tr><td><code>tcp-server-v3/</code></td><td>TCP server + client library for inter-process communication</td></tr>
+      <tr><td><code>native-library/</code></td><td>Dynamic function dispatch for CALL opsl.functionCall</td></tr>
+      <tr><td><code>start-tcp-server.js</code></td><td>Standalone script to start the TCP server</td></tr>
+      <tr><td><code>langs/commands/</code></td><td>Language command templates (js.json, py.json, etc.)</td></tr>
+      <tr><td><code>allTests/</code></td><td>Test projects: LoopTest2, testing3, etc.</td></tr>
+      <tr><td><code>oldFiles/</code></td><td>Deprecated VM-based implementation (kept for reference)</td></tr>
+    </table>
+  </div>
+</main>
+</body>
+</html>

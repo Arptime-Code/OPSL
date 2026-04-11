@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — OPSL Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--cyan:#06b6d4;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;min-width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--accent)}
+h4{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--text)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.system-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:20px 0;position:relative}
+.system-box::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:3px;border-radius:0 0 3px 3px}
+.system-box.blue::before{background:var(--accent)}
+.system-box.green::before{background:var(--green)}
+.system-box.orange::before{background:var(--orange)}
+.system-box.pink::before{background:var(--pink)}
+.system-box.purple::before{background:var(--purple)}
+.system-box h3{margin-top:0;display:flex;align-items:center;gap:8px}
+.system-box h4{color:var(--text);margin-top:12px}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre;color:#e6edf3}
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.note strong{color:var(--accent)}
+.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.flow-step{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px 16px;min-width:130px}
+.flow-step .n{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.flow-step h4{font-size:12px;font-weight:600;margin-bottom:2px}
+.flow-step p{font-size:10px;color:var(--text2);margin:0}
+.flow-arrow{color:var(--text2);font-size:18px}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="architecture.html" class="active">Architecture</a>
+  <a href="tcp-system.html">TCP System</a>
+  <a href="api-reference.html">API Reference</a>
+  <a href="code-walkthrough.html">Code Walkthrough</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html">Home</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="architecture.html" class="active">Architecture</a>
+    <a href="tcp-system.html">TCP System</a>
+    <a href="api-reference.html">API Reference</a>
+    <a href="code-walkthrough.html">Code Walkthrough</a>
+    <h3>This Page</h3>
+    <a href="#overview">System Overview</a>
+    <a href="#6-subsystems">6 Subsystems</a>
+    <a href="#data-flow">Data Flow</a>
+    <a href="#process-model">Process Model</a>
+    <a href="#performance">Performance</a>
+  </div>
+  <div id="content">
+    <h1>Architecture</h1>
+    <p class="subtitle">How OPSL is organized — from the moment you run a script to the moment code executes.</p>
+
+    <h2 id="overview">System Overview</h2>
+    <p>OPSL has <strong>6 major subsystems</strong> that work together to execute your scripts. Each subsystem is responsible for one specific job, and they communicate through well-defined interfaces.</p>
+
+    <div class="flow">
+      <div class="flow-step"><div class="n">①</div><h4>Text Parsing</h4><p>Raw text → objects</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">②</div><h4>Instruction Execution</h4><p>Runtime orchestrates</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">③</div><h4>TCP Communication</h4><p>Routes messages</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">④</div><h4>Process Management</h4><p>Spawn/kill processes</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">⑤</div><h4>Data Management</h4><p>Variables & functions</p></div>
+    </div>
+
+    <h2 id="6-subsystems">The 6 Subsystems</h2>
+
+    <div class="system-box purple">
+      <h3>① Text Parsing <span style="font-size:11px;color:var(--text2);font-weight:400">parser.js</span></h3>
+      <p>Converts raw OPSL text into structured JavaScript objects. Uses simple string replacement — no regex.</p>
+      <h4>How it works</h4>
+      <p>The <code>splitBy()</code> function takes a string and a list of delimiters. It replaces each delimiter with <code>|</code>, then splits on <code>|</code>. This normalizes all separators into one common character.</p>
+      <div class="code-block">// "VARIABLE test.x = &quot;hello&quot;"
+// Step 1: Replace ' = ' with '|'  →  'VARIABLE test.x|"hello"'
+// Step 2: Replace '"' with '|'    →  'VARIABLE test.x||hello|'
+// Step 3: Split on '|'            →  ['VARIABLE test.x', '', 'hello', '']
+// Step 4: Map indices to fields   →  {type:'VARIABLE', library:'test', name:'x', value:'hello'}</div>
+      <h4>Output</h4>
+      <p>Each instruction becomes a plain JavaScript object with a <code>type</code> field and the relevant data:</p>
+      <table>
+        <tr><th>Instruction</th><th>Object Shape</th></tr>
+        <tr><td>IMPORT</td><td><code>{type:'IMPORT', lang:'js', library:'test'}</code></td></tr>
+        <tr><td>VARIABLE</td><td><code>{type:'VARIABLE', library:'test', name:'x', value:'hello'}</code></td></tr>
+        <tr><td>ASSIGN</td><td><code>{type:'ASSIGN', library:'test', name:'result', libraryValue:'add', variableValue:'output'}</code></td></tr>
+        <tr><td>CALL</td><td><code>{type:'CALL', library:'test', name:'sayHello'}</code></td></tr>
+      </table>
+    </div>
+
+    <div class="system-box blue">
+      <h3>② Instruction Execution <span style="font-size:11px;color:var(--text2);font-weight:400">runtimeTCP/</span></h3>
+      <p>The Runtime class reads parsed instructions one by one and dispatches each to the appropriate handler. This is the brain of OPSL.</p>
+      <h4>7 Modular Files</h4>
+      <table>
+        <tr><th>File</th><th>Responsibility</th></tr>
+        <tr><td><code>main.js</code></td><td>Entry point: kills old processes → starts server → reads .opsl → executes → cleanup</td></tr>
+        <tr><td><code>runtime.js</code></td><td>Runtime class: processOPSLString() loops through lines, switch dispatches handlers</td></tr>
+        <tr><td><code>server-manager.js</code></td><td>Starts/stops the TCP server process</td></tr>
+        <tr><td><code>library-loader.js</code></td><td>Finds .js files on disk, creates TCP workers</td></tr>
+        <tr><td><code>instruction-handler.js</code></td><td>4 handlers: handleImport/Variable/Assign/Call</td></tr>
+        <tr><td><code>opsl-executor.js</code></td><td>Finds and executes nested .opsl files</td></tr>
+        <tr><td><code>cleanup.js</code></td><td>Kills library processes and TCP server</td></tr>
+      </table>
+    </div>
+
+    <div class="system-box green">
+      <h3>③ TCP Communication <span style="font-size:11px;color:var(--text2);font-weight:400">tcp-workers.js + tcp-server-v3/</span></h3>
+      <p>All inter-process communication happens through TCP. A central server on port 3000 routes messages between library clients.</p>
+      <h4>Key Concepts</h4>
+      <ul>
+        <li><strong>Persistent Socket:</strong> One TCP connection opened once, reused for every instruction. ~0.06ms per instruction vs ~100ms if reconnecting.</li>
+        <li><strong>Message Format:</strong> <code>requestId:name:action:key[:value]\n</code> — newline-delimited, colon-separated strings.</li>
+        <li><strong>Request Tracking:</strong> Each request gets a unique ID. Responses are matched back to pending promises by ID.</li>
+        <li><strong>Remote Calls:</strong> When library A calls B's function, the server opens a new TCP connection to B's local server, sends the call, reads the result, and returns it.</li>
+      </ul>
+    </div>
+
+    <div class="system-box pink">
+      <h3>④ Process Management <span style="font-size:11px;color:var(--text2);font-weight:400">tcp-workers.js</span></h3>
+      <p>Each JavaScript library runs as its own <code>node library.js</code> child process — completely isolated with its own memory, event loop, and TCP connection.</p>
+      <h4>Lifecycle</h4>
+      <div class="flow">
+        <div class="flow-step"><div class="n">1</div><h4>Kill Old</h4><p><code>fuser -k PORT/tcp</code></p></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="n">2</div><h4>Spawn</h4><p><code>spawn('node', file)</code></p></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="n">3</div><h4>Initialize</h4><p>TCPClient.init()</p></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="n">4</div><h4>Ready</h4><p>Prints signal to stdout</p></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="n">5</div><h4>Execute</h4><p>Receives TCP calls</p></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="n">6</div><h4>Cleanup</h4><p>process.kill()</p></div>
+      </div>
+    </div>
+
+    <div class="system-box orange">
+      <h3>⑤ Data Management <span style="font-size:11px;color:var(--text2);font-weight:400">TCP Server + Client API</span></h3>
+      <p>Variables are stored on the TCP server under each library's namespace. All values are strings — no type conversion.</p>
+      <h4>Storage Model</h4>
+      <div class="code-block">// Server-side:
+clients = {
+    test:  { values: {myVar: "hello", count: "42"}, functions: ["sayHello"], port: 4001 },
+    add:   { values: {number: "5", output: "5"}, functions: ["add"], port: 4010 },
+    ifJS:  { values: {output: "LoopTest.loop", number: "5"}, functions: ["ifFunc"], port: 4011 }
+}</div>
+      <h4>In-Function Variable Updates</h4>
+      <p>When a function modifies a variable, it MUST call <code>TCPClient.set()</code> to update the server. Local-only changes are invisible to other libraries.</p>
+      <div class="code-block">async function increment() {
+    var current = await TCPClient.get('counter');      // Read from server
+    var newVal = String(Number(current) + 1);           // Modify locally
+    await TCPClient.set('counter', newVal);             // Update server
+}</div>
+    </div>
+
+    <div class="system-box blue">
+      <h3>⑥ File References <span style="font-size:11px;color:var(--text2);font-weight:400">Source files</span></h3>
+      <p>Each library file is a standalone Node.js script that uses the TCPClient API. The runtime finds libraries by searching two locations.</p>
+      <h4>Search Order</h4>
+      <ol>
+        <li><code>projectFolder/libraryName.js</code> — project root (checked first)</li>
+        <li><code>opsl-local/libraryName/libraryName.js</code> — local library folder (fallback)</li>
+      </ol>
+    </div>
+
+    <h2 id="data-flow">Data Flow: One Complete Instruction</h2>
+    <p>Let's trace what happens when the runtime executes <code>VARIABLE test.myVar = "hello"</code>:</p>
+    <div class="flow">
+      <div class="flow-step"><div class="n">1</div><h4>Runtime reads line</h4><p>processOPSLString()</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">2</div><h4>parser.parseLine()</h4><p>Returns object</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">3</div><h4>switch dispatches</h4><p>case 'VARIABLE'</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">4</div><h4>handleVariable()</h4><p>Looks up worker</p></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="n">5</div><h4>tcpWorkerLib.setVariable()</h4><p>sendRuntimeRequest()</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">6</div><h4>Persistent socket</h4><p>Sends 'id:test:set:myVar:hello'</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">7</div><h4>TCP server</h4><p>Stores clients.test.values.myVar</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">8</div><h4>Response</h4><p>'id:ok' back to runtime</p></div>
+    </div>
+
+    <h2 id="process-model">Process Model</h2>
+    <p>At any given time during execution, these processes exist:</p>
+    <table>
+      <tr><th>Process</th><th>Started By</th><th>Purpose</th></tr>
+      <tr><td><code>node runtimeTCP/main.js</code></td><td>You (the user)</td><td>Main runtime process — orchestrates everything</td></tr>
+      <tr><td><code>node tcp-server-v3/server/index.js</code></td><td>server-manager.js</td><td>TCP server on port 3000 — routes all messages</td></tr>
+      <tr><td><code>node library1.js</code></td><td>tcp-workers.js</td><td>Library 1 — has its own TCP client + local server</td></tr>
+      <tr><td><code>node library2.js</code></td><td>tcp-workers.js</td><td>Library 2 — same pattern, different port</td></tr>
+      <tr><td><code>node library3.js</code></td><td>tcp-workers.js</td><td>Library 3 — and so on...</td></tr>
+    </table>
+    <p>Each library process connects to the TCP server AND runs its own local TCP server for receiving function calls from other libraries.</p>
+
+    <h2 id="performance">Performance</h2>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Per-instruction latency</td><td>~0.06ms (60 microseconds)</td></tr>
+      <tr><td>1000-iteration loop</td><td>~0.7 seconds total</td></tr>
+      <tr><td>Startup overhead</td><td>~500ms (server startup + port cleanup)</td></tr>
+      <tr><td>TCP round-trip</td><td>~0.02ms (localhost)</td></tr>
+    </table>
+    <div class="note">
+      <strong>Why so fast?</strong> The persistent socket eliminates reconnection overhead. Each instruction reuses the same TCP connection, avoiding the ~100ms cost of opening/closing connections per instruction.
+    </div>
+  </div>
+</main>
+</body>
+</html>

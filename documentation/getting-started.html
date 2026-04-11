@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting Started — OPSL Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--cyan:#06b6d4;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;min-width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--accent)}
+h4{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--text)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre;color:#e6edf3}
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.note strong{color:var(--accent)}
+.note-green{background:rgba(34,197,94,0.08);border-left-color:var(--green)}.note-green strong{color:var(--green)}
+.note-orange{background:rgba(245,158,11,0.08);border-left-color:var(--orange)}.note-orange strong{color:var(--orange)}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+.step{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0}
+.step h4{color:var(--accent);margin-top:0}
+.step-num{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+.card h3{margin-top:0}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--accent)}
+.badge-green{background:rgba(34,197,94,0.15);color:var(--green)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="getting-started.html" class="active">Getting Started</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="tcp-system.html">TCP System</a>
+  <a href="api-reference.html">API Reference</a>
+  <a href="code-walkthrough.html">Code Walkthrough</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html">Home</a>
+    <a href="getting-started.html" class="active">Getting Started</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="tcp-system.html">TCP System</a>
+    <a href="api-reference.html">API Reference</a>
+    <a href="code-walkthrough.html">Code Walkthrough</a>
+    <h3>This Page</h3>
+    <a href="#install">Installation</a>
+    <a href="#first-script">Your First Script</a>
+    <a href="#library">Write a Library</a>
+    <a href="#opsl-instructions">OPSL Instructions</a>
+    <a href="#full-example">Full Example</a>
+    <a href="#running">Running Scripts</a>
+    <a href="#project-structure">Project Structure</a>
+    <a href="#next-steps">Next Steps</a>
+  </div>
+  <div id="content">
+    <h1>Getting Started</h1>
+    <p class="subtitle">Learn how to write, run, and understand OPSL scripts — from zero to a working multi-library program.</p>
+
+    <h2 id="install">Installation</h2>
+    <p>OPSL has <strong>no external dependencies</strong>. It uses only Node.js built-in modules (<code>net</code>, <code>child_process</code>, <code>fs</code>, <code>path</code>, <code>vm</code>). All you need is Node.js installed.</p>
+
+    <div class="note">
+      <strong>Requirements:</strong> Node.js v14 or later. No npm install needed.
+    </div>
+
+    <h4>Verify your setup:</h4>
+    <div class="code-block">node --version
+# Should show v14 or higher</div>
+
+    <h2 id="first-script">Your First OPSL Script</h2>
+
+    <div class="step">
+      <h4><span class="step-num">1</span> Create a project folder</h4>
+      <div class="code-block">mkdir my-opsl-project
+cd my-opsl-project
+mkdir opsl-local/greeting
+mkdir opsl-local/greeting</div>
+    </div>
+
+    <div class="step">
+      <h4><span class="step-num">2</span> Create an OPSL script</h4>
+      <p>Create a file called <code>test.opsl</code> in your project folder:</p>
+      <div class="code-block">IMPORT [js] greeting
+
+VARIABLE greeting.name = "World"
+CALL greeting.showMessage</div>
+      <p>This script does three things:</p>
+      <ul>
+        <li><strong>IMPORT</strong> — loads the <code>greeting</code> JavaScript library</li>
+        <li><strong>VARIABLE</strong> — sets a variable <code>name</code> in the greeting library</li>
+        <li><strong>CALL</strong> — executes the <code>showMessage</code> function</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h4><span class="step-num">3</span> Create a TCP-enabled library</h4>
+      <p>Create <code>opsl-local/greeting/greeting.js</code>:</p>
+      <div class="code-block">const TCPClient = require('/path/to/tcp-server-v3/client');
+
+function showMessage() {
+    console.log("Hello from greeting!");
+}
+
+(async () => {
+    await TCPClient.init('greeting', 4001);
+    await TCPClient.registerFunction('showMessage', showMessage);
+    console.log("loaded and registered");
+})();</div>
+      <div class="note note-orange">
+        <strong>Important:</strong> Replace <code>/path/to/</code> with the actual absolute path to your OPSL project's <code>tcp-server-v3/client</code> directory. Each library needs this to communicate with the TCP server.
+      </div>
+    </div>
+
+    <div class="step">
+      <h4><span class="step-num">4</span> Run it</h4>
+      <div class="code-block">cd /path/to/OPSL (Copy 2)
+node runtimeTCP/main.js /path/to/my-opsl-project/test.opsl</div>
+      <p>You should see:</p>
+      <div class="code-block">Starting fresh TCP server...
+[TCP Server] Server on 3000
+TCP server started with clean state
+Importing library: greeting (js)
+[greeting] loaded and registered
+[greeting] Hello from greeting!
+TCP server stopped
+
+OPSL execution completed successfully</div>
+    </div>
+
+    <h2 id="library">How to Write a TCP-Enabled Library</h2>
+    <p>Every JavaScript library in OPSL follows the same pattern. Here's the anatomy:</p>
+
+    <div class="card">
+      <h3>Library Template</h3>
+      <div class="code-block">// 1. Require the TCP client library
+const TCPClient = require('/absolute/path/to/tcp-server-v3/client');
+
+// 2. Define your functions normally
+function myFunction() {
+    console.log("Hello!");
+    return "result";
+}
+
+// 3. Define variables
+var myVariable = "initial value";
+
+// 4. Initialize, register, and signal ready
+(async () => {
+    await TCPClient.init('libraryName', uniquePort);
+    await TCPClient.registerFunction('myFunction', myFunction);
+    await TCPClient.set('myVariable', myVariable);
+    console.log("loaded and registered");
+})();</div>
+    </div>
+
+    <h4>Key rules:</h4>
+    <ul>
+      <li><strong>Each library needs a unique port</strong> — start at 4001 and increment (4002, 4003, etc.)</li>
+      <li><strong>Register every function</strong> you want other libraries or OPSL scripts to call</li>
+      <li><strong>Set initial variables</strong> with <code>TCPClient.set()</code></li>
+      <li><strong>Print "loaded and registered"</strong> — the runtime waits for this exact string</li>
+      <li><strong>Use absolute paths</strong> in the <code>require()</code> — relative paths won't work because libraries run from their own directories</li>
+    </ul>
+
+    <h4>Updating variables inside functions:</h4>
+    <div class="note">
+      <strong>Critical:</strong> If a function modifies a variable, it MUST call <code>TCPClient.set()</code> to update the TCP server. Otherwise, other libraries won't see the change.
+    </div>
+    <div class="code-block">async function increment() {
+    // Get the latest value from the server
+    var current = await TCPClient.get('counter');
+    var newVal = String(Number(current) + 1);
+
+    // Update on the server so other libs see it
+    await TCPClient.set('counter', newVal);
+
+    return newVal;
+}</div>
+
+    <h2 id="opsl-instructions">The 4 OPSL Instructions</h2>
+    <table>
+      <tr><th>Instruction</th><th>Format</th><th>What it does</th></tr>
+      <tr><td><strong>IMPORT</strong></td><td><code>IMPORT [lang] name</code></td><td>Loads a library. lang = js, py, c, or opsl</td></tr>
+      <tr><td><strong>VARIABLE</strong></td><td><code>VARIABLE lib.name = "value"</code></td><td>Stores a variable in a library via TCP</td></tr>
+      <tr><td><strong>ASSIGN</strong></td><td><code>ASSIGN target.name = source.var</code></td><td>Copies a variable from one library to another</td></tr>
+      <tr><td><strong>CALL</strong></td><td><code>CALL lib.functionName</code></td><td>Executes a function (via TCP for JS, nested .opsl for OPSL)</td></tr>
+    </table>
+
+    <h3>IMPORT</h3>
+    <p>Loads a JavaScript library. The runtime searches for the file in two locations (in order):</p>
+    <ol>
+      <li><code>projectFolder/libraryName.js</code> — project root</li>
+      <li><code>opsl-local/libraryName/libraryName.js</code> — local library folder</li>
+    </ol>
+    <div class="code-block">IMPORT [js] test       → looks for test/test.js or opsl-local/test/test.js
+IMPORT [opsl] helper   → looks for helper.opsl or opsl-local/helper/helper.opsl</div>
+
+    <h3>VARIABLE</h3>
+    <p>Sets a variable in a library. The value is sent over TCP and stored on the server.</p>
+    <div class="code-block">VARIABLE test.name = "Alice"    → stores test.name = "Alice" on TCP server
+VARIABLE add.x = "42"           → stores add.x = "42"</div>
+
+    <h3>ASSIGN</h3>
+    <p>Copies a variable from one library to another. This requires TWO TCP round-trips: GET from source, SET to target.</p>
+    <div class="code-block">ASSIGN test.result = add.output    → get add.output, set test.result = that value</div>
+
+    <h3>CALL</h3>
+    <p>For JS libraries: sends a function call through TCP to the library's local server.<br>
+    For OPSL libraries: finds and executes a nested .opsl file.</p>
+    <div class="code-block">CALL test.sayHello              → executes test.sayHello() via TCP
+CALL opsl.functionCall          → dynamic dispatch: reads functionVar, executes lib.func</div>
+
+    <h2 id="full-example">Full Example: Counting Loop</h2>
+    <p>This example counts from 0 to 1000, printing each number. It uses two libraries: <code>add</code> (increments) and <code>ifJS</code> (checks the condition).</p>
+
+    <h4>loop.opsl</h4>
+    <div class="code-block">IMPORT [js] ifJS
+IMPORT [js] add
+
+VARIABLE ifJS.trueReturn = ""
+VARIABLE ifJS.falseReturn = "LoopTest.loop"
+ASSIGN ifJS.number = add.output
+
+CALL ifJS.ifFunc
+
+ASSIGN opsl.consoleLog = ifJS.number
+CALL opsl.consoleLog
+
+ASSIGN add.number = ifJS.number
+CALL add.add
+
+ASSIGN opsl.functionVar = ifJS.output
+CALL opsl.functionCall</div>
+
+    <h4>opsl-local/add/add.js</h4>
+    <div class="code-block">const TCPClient = require('.../tcp-server-v3/client');
+
+let number = "0"
+let output = "0"
+
+async function add() {
+    number = await TCPClient.get('number');
+    number = String(Number(number) + 1)
+    output = number
+    await TCPClient.set('number', number);
+    await TCPClient.set('output', output);
+}
+
+(async () => {
+    await TCPClient.init('add', 4010);
+    await TCPClient.registerFunction('add', add);
+    await TCPClient.set('number', number);
+    await TCPClient.set('output', output);
+    console.log("add.js loaded and registered");
+})();</div>
+
+    <h4>opsl-local/ifJS/ifJS.js</h4>
+    <div class="code-block">const TCPClient = require('.../tcp-server-v3/client');
+
+let output = "LoopTest.loop";
+let trueReturn = "";
+let falseReturn = "LoopTest.loop";
+let number = "0"
+
+async function ifFunc() {
+    number = await TCPClient.get('number');
+    trueReturn = await TCPClient.get('trueReturn');
+    falseReturn = await TCPClient.get('falseReturn');
+
+    console.log(number);
+    if(Number(number) > 1000) {
+        output = trueReturn;
+    } else {
+        output = falseReturn;
+    }
+
+    await TCPClient.set('output', output);
+}
+
+(async () => {
+    await TCPClient.init('ifJS', 4011);
+    await TCPClient.registerFunction('ifFunc', ifFunc);
+    await TCPClient.set('output', output);
+    await TCPClient.set('trueReturn', trueReturn);
+    await TCPClient.set('falseReturn', falseReturn);
+    await TCPClient.set('number', number);
+    console.log("ifJS.js loaded and registered");
+})();</div>
+
+    <h2 id="running">Running Scripts</h2>
+    <div class="code-block"># From the OPSL project root:
+node runtimeTCP/main.js /path/to/your/script.opsl
+
+# Or use the old entry point (delegates to runtimeTCP/):
+node runtime-tcp.js /path/to/your/script.opsl</div>
+
+    <div class="note note-green">
+      <strong>Tip:</strong> Each run starts a fresh TCP server, killing old processes first. This ensures clean state with no leftover variables or port conflicts.
+    </div>
+
+    <h2 id="project-structure">Recommended Project Structure</h2>
+    <div class="code-block">my-project/
+├── test.opsl                      ← Your main OPSL script
+└── opsl-local/
+    ├── greeting/
+    │   └── greeting.js            ← TCP-enabled JS library
+    ├── math/
+    │   └── math.js                ← Another library
+    └── helper/
+        └── helper.opsl            ← OPSL library (nested .opsl)</div>
+
+    <h2 id="next-steps">Next Steps</h2>
+    <div class="card">
+      <h3><a href="architecture.html">🏗️ Learn the Architecture</a></h3>
+      <p>Understand how the 6 subsystems connect: Text Parsing → Instruction Execution → TCP Communication → Process Management → Data Management → File References.</p>
+    </div>
+    <div class="card">
+      <h3><a href="tcp-system.html">🌐 Deep Dive into TCP</a></h3>
+      <p>Learn about the persistent socket, message protocol, server routing, and how function calls travel between libraries.</p>
+    </div>
+    <div class="card">
+      <h3><a href="api-reference.html">📖 API Reference</a></h3>
+      <p>Complete reference for TCPClient methods, OPSL instructions, and configuration variables.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

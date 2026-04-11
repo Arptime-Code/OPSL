@@ -1,0 +1,5 @@
+IMPORT [js] greeting
+
+VARIABLE greeting.salutation = "greeting says:"
+
+CALL greeting.showMessage

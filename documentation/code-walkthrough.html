@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Walkthrough — OPSL Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;min-width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--accent)}
+h4{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--text)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre;color:#e6edf3}
+.code-block .kw{color:#ff7b72}.code-block .str{color:#a5d6ff}.code-block .cm{color:#8b949e;font-style:italic}.code-block .fn{color:#d2a8ff}
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.note strong{color:var(--accent)}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+.file-section{margin:32px 0}
+.file-section h2{margin-top:0}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="tcp-system.html">TCP System</a>
+  <a href="api-reference.html">API Reference</a>
+  <a href="code-walkthrough.html" class="active">Code Walkthrough</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html">Home</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="tcp-system.html">TCP System</a>
+    <a href="api-reference.html">API Reference</a>
+    <a href="code-walkthrough.html" class="active">Code Walkthrough</a>
+    <h3>Files</h3>
+    <a href="#parser">parser.js</a>
+    <a href="#workers">tcp-workers.js</a>
+    <a href="#runtime-main">runtimeTCP/main.js</a>
+    <a href="#runtime-class">runtimeTCP/runtime.js</a>
+    <a href="#server-mgr">runtimeTCP/server-manager.js</a>
+    <a href="#lib-loader">runtimeTCP/library-loader.js</a>
+    <a href="#instr-handler">runtimeTCP/instruction-handler.js</a>
+    <a href="#opsl-exec">runtimeTCP/opsl-executor.js</a>
+    <a href="#cleanup">runtimeTCP/cleanup.js</a>
+    <a href="#native">native-library/library.js</a>
+  </div>
+  <div id="content">
+    <h1>Code Walkthrough</h1>
+    <p class="subtitle">File-by-file explanation of every source file in the project — what it does, how it works, and why.</p>
+
+    <div class="file-section" id="parser">
+      <h2>parser.js <span style="font-size:12px;color:var(--text2);font-weight:400">~100 lines</span></h2>
+      <p><strong>Purpose:</strong> Converts OPSL text lines into structured JavaScript objects.</p>
+      <p><strong>How it works:</strong> The <code>splitBy()</code> helper replaces delimiters with <code>|</code>, then splits. The <code>parseLine()</code> function checks which keyword a line starts with and extracts the relevant fields.</p>
+      <h4>Key functions</h4>
+      <ul>
+        <li><code>parseLine(lineInput)</code> — main entry point. Checks startsWith() for each keyword.</li>
+        <li><code>parseImport(trimmed)</code> — splits by spaces and brackets, returns {type, lang, library}</li>
+        <li><code>parseAssign(trimmed)</code> — splits by ' = ', '.', spaces — returns 5 fields</li>
+        <li><code>parseVariable(trimmed)</code> — splits by ' = ', then left by '.', right by '"' — returns library, name, value</li>
+        <li><code>parseCall(trimmed)</code> — splits by '.' and space — returns {type, library, name}</li>
+        <li><code>splitBy(text, replacements)</code> — replaces each delimiter with '|', then splits</li>
+      </ul>
+      <h4>Design decision</h4>
+      <p>No regex. Simple string replacement is clearer for beginners and sufficient for OPSL's predictable syntax.</p>
+    </div>
+
+    <div class="file-section" id="workers">
+      <h2>tcp-workers.js <span style="font-size:12px;color:var(--text2);font-weight:400">~150 lines</span></h2>
+      <p><strong>Purpose:</strong> Two jobs: (1) Maintain one persistent TCP socket for all runtime requests. (2) Spawn JS libraries as separate Node.js processes.</p>
+      <h4>Key functions</h4>
+      <ul>
+        <li><code>getRuntimeSocket()</code> — lazy initializer. Creates TCP connection once, reuses forever.</li>
+        <li><code>handleIncomingData(chunk)</code> — buffers TCP data, splits on newlines, resolves matching requests.</li>
+        <li><code>sendRuntimeRequest(name, action, key, value)</code> — sends formatted message, returns Promise.</li>
+        <li><code>createWorker(lang, name, file)</code> — creates worker object; for JS, spawns process and waits for ready.</li>
+        <li><code>createJSWorker(worker)</code> — kills old process, spawns new, sets up stdout listener, waits for ready.</li>
+        <li><code>setVariable/getVariable/executeFunction()</code> — thin wrappers around sendRuntimeRequest.</li>
+      </ul>
+      <h4>Persistent socket details</h4>
+      <div class="code-block">// Global state:
+var runtimeSocket = null;          // Created once, reused
+var socketBuffer = '';             // Accumulates partial TCP data
+var pendingRequests = {};          // Maps request IDs to resolve functions
+var nextRequestId = 0;             // Increments for each request</div>
+    </div>
+
+    <div class="file-section" id="runtime-main">
+      <h2>runtimeTCP/main.js <span style="font-size:12px;color:var(--text2);font-weight:400">~55 lines</span></h2>
+      <p><strong>Purpose:</strong> Entry point. Orchestrates the entire execution lifecycle.</p>
+      <h4>Flow (5 steps)</h4>
+      <ol>
+        <li><code>killOldProcesses()</code> — frees all known ports with <code>fuser -k</code></li>
+        <li><code>serverManager.startServer()</code> — spawns TCP server process</li>
+        <li><code>fs.readFileSync(inputFile)</code> — reads the .opsl script</li>
+        <li><code>new Runtime(inputFile).processOPSLString()</code> — executes the script</li>
+        <li><code>cleanup.cleanup()</code> — kills all library processes and TCP server</li>
+      </ol>
+    </div>
+
+    <div class="file-section" id="runtime-class">
+      <h2>runtimeTCP/runtime.js <span style="font-size:12px;color:var(--text2);font-weight:400">~60 lines</span></h2>
+      <p><strong>Purpose:</strong> The Runtime class — ties all modules together.</p>
+      <h4>Key methods</h4>
+      <ul>
+        <li><code>processOPSLString(fileString)</code> — splits by newlines, parses each line, dispatches by type</li>
+        <li><code>createWorker(name, lang)</code> — delegates to library-loader</li>
+        <li><code>executeOPSLFunction(lib, name)</code> — delegates to opsl-executor</li>
+        <li><code>getGlobalLibraries()</code> — exposes shared state for cleanup</li>
+      </ul>
+      <h4>Dispatch pattern</h4>
+      <div class="code-block">switch (instruction.type) {
+    case 'IMPORT':   await instructionHandler.handleImport(instruction, this); break;
+    case 'VARIABLE': await instructionHandler.handleVariable(instruction, this); break;
+    case 'ASSIGN':   await instructionHandler.handleAssign(instruction, this); break;
+    case 'CALL':     await instructionHandler.handleCall(instruction, this); break;
+}</div>
+    </div>
+
+    <div class="file-section" id="server-mgr">
+      <h2>runtimeTCP/server-manager.js <span style="font-size:12px;color:var(--text2);font-weight:400">~55 lines</span></h2>
+      <p><strong>Purpose:</strong> Start, check, and stop the TCP server process.</p>
+      <h4>Key functions</h4>
+      <ul>
+        <li><code>isServerRunning()</code> — tries to connect to port 3000. Success = running.</li>
+        <li><code>startServer()</code> — spawns <code>node tcp-server-v3/server/index.js</code>, waits 500ms.</li>
+        <li><code>stopServer(serverProcess)</code> — <code>process.kill(-pid)</code> to kill process group.</li>
+      </ul>
+    </div>
+
+    <div class="file-section" id="lib-loader">
+      <h2>runtimeTCP/library-loader.js <span style="font-size:12px;color:var(--text2);font-weight:400">~40 lines</span></h2>
+      <p><strong>Purpose:</strong> Finds library files on disk and creates TCP workers.</p>
+      <h4>Search order</h4>
+      <ol>
+        <li><code>baseDir/libraryName.js</code> — project root (checked first)</li>
+        <li><code>baseDir/opsl-local/libraryName/libraryName.js</code> — local folder (fallback)</li>
+      </ol>
+      <p>Then calls <code>tcpWorkerLib.createWorker(lang, name, filePath)</code> to spawn the process.</p>
+    </div>
+
+    <div class="file-section" id="instr-handler">
+      <h2>runtimeTCP/instruction-handler.js <span style="font-size:12px;color:var(--text2);font-weight:400">~95 lines</span></h2>
+      <p><strong>Purpose:</strong> Four handler functions — one for each OPSL instruction type.</p>
+      <h4>Handler details</h4>
+      <ul>
+        <li><code>handleImport</code> — checks duplicate → creates worker → stores in globalLibraries</li>
+        <li><code>handleVariable</code> — looks up worker → calls <code>tcpWorkerLib.setVariable()</code></li>
+        <li><code>handleAssign</code> — GETs from source → SETs to target (skips OPSL libs)</li>
+        <li><code>handleCall</code> — checks special cases (functionCall, consoleLog) → routes to OPSL or JS execution</li>
+      </ul>
+    </div>
+
+    <div class="file-section" id="opsl-exec">
+      <h2>runtimeTCP/opsl-executor.js <span style="font-size:12px;color:var(--text2);font-weight:400">~55 lines</span></h2>
+      <p><strong>Purpose:</strong> Finds and executes nested .opsl files (when OPSL calls OPSL).</p>
+      <h4>How it works</h4>
+      <ol>
+        <li>Searches for <code>library/name.opsl</code> in root or opsl-local</li>
+        <li>Reads the file as a string</li>
+        <li>Creates a new Runtime instance (nested)</li>
+        <li>Copies parent's <code>importedLibraries</code> so the nested runtime shares all libraries</li>
+        <li>Calls <code>processOPSLString()</code> on the nested file</li>
+      </ol>
+    </div>
+
+    <div class="file-section" id="cleanup">
+      <h2>runtimeTCP/cleanup.js <span style="font-size:12px;color:var(--text2);font-weight:400">~25 lines</span></h2>
+      <p><strong>Purpose:</strong> Gracefully shuts down everything at the end of execution.</p>
+      <h4>Steps</h4>
+      <ol>
+        <li>Iterates globalLibraries, calls <code>tcpWorkerLib.closeWorker()</code> for each</li>
+        <li>Calls <code>serverManager.stopServer()</code> to kill the TCP server</li>
+        <li>All kill() calls wrapped in try/catch for safety (processes may already be dead)</li>
+      </ol>
+    </div>
+
+    <div class="file-section" id="native">
+      <h2>native-library/library.js <span style="font-size:12px;color:var(--text2);font-weight:400">~50 lines</span></h2>
+      <p><strong>Purpose:</strong> Dynamic function dispatch — parses "library.functionName" strings and routes execution.</p>
+      <h4>How it works</h4>
+      <ol>
+        <li>Splits "library.functionName" on '.'</li>
+        <li>Checks if the library is imported</li>
+        <li>If OPSL: calls <code>executeOPSLFunction()</code></li>
+        <li>If JS: calls <code>worker.executeFunction()</code> (TCP remote call)</li>
+      </ol>
+      <p>Used by <code>CALL opsl.functionCall</code> to dynamically execute whatever function is stored in the <code>functionVar</code> variable.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

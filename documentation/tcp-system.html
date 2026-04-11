@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCP System — OPSL Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;min-width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--accent)}
+h4{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--text)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre;color:#e6edf3}
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.note strong{color:var(--accent)}
+.note-green{background:rgba(34,197,94,0.08);border-left-color:var(--green)}.note-green strong{color:var(--green)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:16px 0}
+.card h3{margin-top:0}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.flow-step{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 14px;min-width:120px}
+.flow-step .n{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.flow-step h4{font-size:12px;font-weight:600;margin-bottom:2px}
+.flow-step p{font-size:10px;color:var(--text2);margin:0}
+.flow-arrow{color:var(--text2);font-size:16px}
+.diagram{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;text-align:center;font-family:var(--mono);font-size:12px;line-height:2;color:var(--text2)}
+</div>
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="tcp-system.html" class="active">TCP System</a>
+  <a href="api-reference.html">API Reference</a>
+  <a href="code-walkthrough.html">Code Walkthrough</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html">Home</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="tcp-system.html" class="active">TCP System</a>
+    <a href="api-reference.html">API Reference</a>
+    <a href="code-walkthrough.html">Code Walkthrough</a>
+    <h3>This Page</h3>
+    <a href="#overview">TCP Overview</a>
+    <a href="#server">Server Architecture</a>
+    <a href="#client">Client Architecture</a>
+    <a href="#persistent">Persistent Socket</a>
+    <a href="#protocol">Message Protocol</a>
+    <a href="#flow">Function Call Flow</a>
+    <a href="#performance">Performance Details</a>
+  </div>
+  <div id="content">
+    <h1>TCP Communication System</h1>
+    <p class="subtitle">How libraries communicate through the central TCP server — from connection to message routing to function calls.</p>
+
+    <h2 id="overview">Overview</h2>
+    <p>Every OPSL library runs as its own Node.js process. The only way they communicate is through TCP. A central server on port 3000 routes all messages between clients.</p>
+    <div class="diagram">
+┌──────────┐    TCP    ┌──────────────┐    TCP    ┌──────────┐
+│ Library  │◄─────────►│  TCP Server  │◄─────────►│ Library  │
+│  test    │  port 3000│  (port 3000) │  port 3000│   add    │
+│ port:4001│           │              │           │ port:4010│
+└──────────┘           └──────────────┘           └──────────┘
+       │                       │                        │
+       │  Local Server         │  Local Server          │
+       │  (port 4001)          │  (port 4010)           │
+       └───────────────────────┼────────────────────────┘
+                               │
+                    Function calls flow through
+                    the server → target's local server
+    </div>
+    <p>Each library has <strong>two TCP connections</strong>:</p>
+    <ul>
+      <li><strong>Client connection</strong> to the main server (port 3000) — for set/get/register/callRemote</li>
+      <li><strong>Local server</strong> on a unique port (4001+) — for receiving function calls from other libraries</li>
+    </ul>
+
+    <h2 id="server">Server Architecture</h2>
+    <p>The TCP server lives in <code>tcp-server-v3/server/</code> — 6 files working together:</p>
+    <table>
+      <tr><th>File</th><th>Role</th></tr>
+      <tr><td><code>index.js</code></td><td>Creates net.createServer on port 3000. One parser per socket.</td></tr>
+      <tr><td><code>handler.js</code></td><td>Dispatches messages by action: init/set/get/reg/call</td></tr>
+      <tr><td><code>parser.js</code></td><td>Buffers incoming TCP data, splits on newlines, parses format</td></tr>
+      <tr><td><code>client-registry.js</code></td><td>In-memory store: {name: {values:{}, functions:[], port:N}}</td></tr>
+      <tr><td><code>protocol.js</code></td><td>Formats responses: respond(socket, requestId, data)</td></tr>
+      <tr><td><code>remote-call.js</code></td><td>Routes function calls between clients via their local servers</td></tr>
+    </table>
+
+    <h3>Server Message Handling</h3>
+    <div class="code-block">// When a message arrives:
+// "5:test:set:myVar:hello"
+
+// 1. parser.js buffers and splits:
+buffer += chunk;
+lines = buffer.split('\n');
+message = "5:test:set:myVar:hello";
+
+// 2. parser.js parses:
+{requestId: "5", name: "test", action: "set", key: "myVar", extra: "hello"}
+
+// 3. handler.js dispatches:
+if (action === 'set') {
+    clients[name].values[key] = extra;  // clients.test.values.myVar = "hello"
+    respond(socket, "5", "ok");         // writes "5:ok\n" back
+}</div>
+
+    <h2 id="client">Client Architecture</h2>
+    <p>The client library lives in <code>tcp-server-v3/client/</code> — 6 files:</p>
+    <table>
+      <tr><th>File</th><th>Role</th></tr>
+      <tr><td><code>api.js</code></td><td>Public API: init(), set(), get(), registerFunction(), callRemote()</td></tr>
+      <tr><td><code>connection.js</code></td><td>Persistent TCP connection to server: connectToServer(), sendRaw()</td></tr>
+      <tr><td><code>local-server.js</code></td><td>Local TCP server for receiving function calls</td></tr>
+      <tr><td><code>protocol.js</code></td><td>Builds request messages with incrementing IDs</td></tr>
+      <tr><td><code>responses.js</code></td><td>Parses incoming responses, resolves matching promises</td></tr>
+      <tr><td><code>index.js</code></td><td>Re-exports api.js</td></tr>
+    </table>
+
+    <h2 id="persistent">Persistent Socket (The Big Optimization)</h2>
+    <p>The runtime (tcp-workers.js) maintains <strong>one persistent TCP connection</strong> to the server. This is the single biggest performance improvement in the entire system.</p>
+    <div class="card">
+      <h3>How It Works</h3>
+      <div class="code-block">// In tcp-workers.js:
+var runtimeSocket = null;       // Starts as null
+var pendingRequests = {};       // Maps request IDs to resolve functions
+var nextRequestId = 0;          // Increments for each request
+
+function getRuntimeSocket() {
+    if (runtimeSocket) return Promise.resolve(runtimeSocket);  // REUSE
+    return new Promise(function(resolve) {
+        runtimeSocket = net.connect(3000, function() {
+            resolve(runtimeSocket);
+        });
+        runtimeSocket.on('data', handleIncomingData);  // Single handler
+    });
+}</div>
+      <p><strong>Key insight:</strong> The socket is created once (lazy initialization), then reused forever. No reconnection overhead per instruction.</p>
+    </div>
+
+    <h3>Request-Response Matching</h3>
+    <div class="code-block">// Sending a request:
+function sendRuntimeRequest(name, action, key, value) {
+    return new Promise(function(resolve) {
+        getRuntimeSocket().then(function(socket) {
+            var id = String(++nextRequestId);    // Unique ID
+            pendingRequests[id] = resolve;        // Store resolve function
+
+            var msg = id + ':' + name + ':' + action + ':' + key;
+            if (value !== undefined) msg += ':' + value;
+            socket.write(msg + '\n');            // Send and wait
+        });
+    });
+}
+
+// Receiving the response:
+function handleIncomingData(chunk) {
+    socketBuffer += chunk.toString();
+    var lines = socketBuffer.split('\n');
+    socketBuffer = lines.pop() || '';
+
+    for (var i = 0; i < lines.length; i++) {
+        var colonIdx = lines[i].indexOf(':');
+        var reqId = lines[i].substring(0, colonIdx);
+        var data = lines[i].substring(colonIdx + 1);
+
+        if (pendingRequests[reqId]) {
+            pendingRequests[reqId](data);         // Unblock the await!
+            delete pendingRequests[reqId];        // Prevent memory leaks
+        }
+    }
+}</div>
+
+    <h2 id="protocol">Message Protocol</h2>
+    <p>All messages are newline-delimited strings with colon-separated fields:</p>
+    <table>
+      <tr><th>Direction</th><th>Format</th><th>Example</th></tr>
+      <tr><td>Request</td><td><code>id:name:action:key[:value]\n</code></td><td><code>5:test:set:myVar:hello\n</code></td></tr>
+      <tr><td>Response</td><td><code>id:data\n</code></td><td><code>5:ok\n</code></td></tr>
+    </table>
+
+    <h3>The 5 Actions</h3>
+    <table>
+      <tr><th>Action</th><th>Purpose</th><th>Server Behavior</th></tr>
+      <tr><td><code>init</code></td><td>Register a client</td><td>Stores client's port number</td></tr>
+      <tr><td><code>set</code></td><td>Store a variable</td><td><code>clients[name].values[key] = value</code></td></tr>
+      <tr><td><code>get</code></td><td>Retrieve a variable</td><td>Responds with stored value or empty string</td></tr>
+      <tr><td><code>reg</code></td><td>Register a function</td><td>Adds name to <code>clients[name].functions[]</code></td></tr>
+      <tr><td><code>call</code></td><td>Call a remote function</td><td>Routes to target's local server</td></tr>
+    </table>
+
+    <h2 id="flow">Function Call Flow</h2>
+    <p>When library A calls a function in library B, the message travels through the server:</p>
+    <div class="flow">
+      <div class="flow-step"><div class="n">1</div><h4>A sends 'call'</h4><p>via persistent socket</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">2</div><h4>Server receives</h4><p>handler.js → remote-call.js</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">3</div><h4>Server looks up B's port</h4><p>from client registry</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">4</div><h4>Server connects to B</h4><p>net.connect(B.port)</p></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="n">5</div><h4>Server sends call</h4><p>'call:fnName:args'</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">6</div><h4>B's local server receives</h4><p>looks up fn, executes it</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">7</div><h4>B writes result</h4><p>result + '\n'</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">8</div><h4>Server forwards to A</h4><p>via persistent socket</p></div>
+    </div>
+
+    <h2 id="performance">Performance Details</h2>
+    <table>
+      <tr><th>Scenario</th><th>Time</th></tr>
+      <tr><td>Persistent socket instruction</td><td>~0.06ms</td></tr>
+      <tr><td>If we reconnected per instruction</td><td>~100ms (1600× slower)</td></tr>
+      <tr><td>TCP round-trip (localhost)</td><td>~0.02ms</td></tr>
+      <tr><td>Server message dispatch</td><td>~0.01ms</td></tr>
+      <tr><td>Buffer parsing</td><td>~0.005ms</td></tr>
+    </table>
+    <div class="note note-green">
+      <strong>Bottom line:</strong> The persistent socket saves ~99.94ms per instruction. Over 1000 iterations, that's 99.9 seconds saved.
+    </div>
+  </div>
+</main>
+</body>
+</html>

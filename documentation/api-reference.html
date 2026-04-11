@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Reference — OPSL Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;min-width:220px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--accent)}
+h4{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--text)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.api-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0}
+.api-item h3{margin-top:0;margin-bottom:4px}
+.api-sig{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:8px}
+.api-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px}
+.api-params{font-size:12px;color:var(--text2)}
+.api-params dt{color:var(--accent);font-family:var(--mono);margin-top:4px}
+.api-params dd{margin-left:16px;margin-bottom:4px}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.6;overflow-x:auto;margin:8px 0;white-space:pre;color:#e6edf3}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--accent)}
+.badge-green{background:rgba(34,197,94,0.15);color:var(--green)}
+.badge-orange{background:rgba(245,158,11,0.15);color:var(--orange)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="tcp-system.html">TCP System</a>
+  <a href="api-reference.html" class="active">API Reference</a>
+  <a href="code-walkthrough.html">Code Walkthrough</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html">Home</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="tcp-system.html">TCP System</a>
+    <a href="api-reference.html" class="active">API Reference</a>
+    <a href="code-walkthrough.html">Code Walkthrough</a>
+    <h3>This Page</h3>
+    <a href="#tcpclient">TCPClient API</a>
+    <a href="#opsl-instructions">OPSL Instructions</a>
+    <a href="#config">Configuration</a>
+    <a href="#file-structure">File Structure</a>
+    <a href="#error-handling">Error Handling</a>
+  </div>
+  <div id="content">
+    <h1>API Reference</h1>
+    <p class="subtitle">Complete reference for TCPClient methods, OPSL instructions, configuration variables, and file structure.</p>
+
+    <h2 id="tcpclient">TCPClient API</h2>
+    <p>Available via <code>require('tcp-server-v3/client')</code> in every library.</p>
+
+    <div class="api-item">
+      <div class="api-sig">await TCPClient.init(name, port)</div>
+      <p class="api-desc">Initializes the library: starts a local TCP server on <code>port</code>, connects to the main server, and registers the library.</p>
+      <dl class="api-params">
+        <dt>name</dt><dd>String — unique identifier for this library (e.g., "test", "greeting")</dd>
+        <dt>port</dt><dd>Number — unique port for this library's local server (e.g., 4001, 4002)</dd>
+      </dl>
+      <div class="code-block">await TCPClient.init('test', 4001);</div>
+    </div>
+
+    <div class="api-item">
+      <div class="api-sig">await TCPClient.set(key, value)</div>
+      <p class="api-desc">Stores a key-value pair on the TCP server under this library's namespace.</p>
+      <dl class="api-params">
+        <dt>key</dt><dd>String — variable name</dd>
+        <dt>value</dt><dd>String — variable value (always stored as string)</dd>
+      </dl>
+      <div class="code-block">await TCPClient.set('counter', '42');
+await TCPClient.set('name', 'Alice');</div>
+    </div>
+
+    <div class="api-item">
+      <div class="api-sig">await TCPClient.get(key)</div>
+      <p class="api-desc">Retrieves a stored value from the TCP server.</p>
+      <dl class="api-params">
+        <dt>key</dt><dd>String — variable name</dd>
+      </dl>
+      <div class="code-block">var count = await TCPClient.get('counter');  // "42"
+var missing = await TCPClient.get('nope');    // ""</div>
+    </div>
+
+    <div class="api-item">
+      <div class="api-sig">await TCPClient.registerFunction(name, fn)</div>
+      <p class="api-desc">Makes a function callable by other libraries via <code>callRemote()</code>.</p>
+      <dl class="api-params">
+        <dt>name</dt><dd>String — function name for remote calls</dd>
+        <dt>fn</dt><dd>Function — the actual function to execute</dd>
+      </dl>
+      <div class="code-block">function add(a, b) { return String(Number(a) + Number(b)); }
+await TCPClient.registerFunction('add', add);</div>
+    </div>
+
+    <div class="api-item">
+      <div class="api-sig">await TCPClient.callRemote(target, fn, ...args)</div>
+      <p class="api-desc">Calls a function registered on another library.</p>
+      <dl class="api-params">
+        <dt>target</dt><dd>String — target library name</dd>
+        <dt>fn</dt><dd>String — function name to call</dd>
+        <dt>...args</dt><dd>Any — arguments passed to the function (converted to strings)</dd>
+      </dl>
+      <div class="code-block">var result = await TCPClient.callRemote('add', 'add', 5, 10);
+console.log(result);  // "15"</div>
+    </div>
+
+    <h2 id="opsl-instructions">OPSL Instructions</h2>
+
+    <div class="api-item">
+      <h3>IMPORT <span class="badge badge-green">Load Library</span></h3>
+      <div class="api-sig">IMPORT [lang] libraryName</div>
+      <p class="api-desc">Loads a library. The runtime searches for the library file in two locations.</p>
+      <dl class="api-params">
+        <dt>lang</dt><dd>js | py | c | opsl</dd>
+        <dt>libraryName</dt><dd>String — name used to reference this library in other instructions</dd>
+      </dl>
+      <div class="code-block">IMPORT [js] test
+IMPORT [opsl] helper
+IMPORT [py] pythonLib</div>
+    </div>
+
+    <div class="api-item">
+      <h3>VARIABLE <span class="badge badge-blue">Store Value</span></h3>
+      <div class="api-sig">VARIABLE library.variableName = "value"</div>
+      <p class="api-desc">Stores a variable in a library via TCP.</p>
+      <div class="code-block">VARIABLE test.name = "Alice"
+VARIABLE add.counter = "0"</div>
+    </div>
+
+    <div class="api-item">
+      <h3>ASSIGN <span class="badge badge-blue">Copy Variable</span></h3>
+      <div class="api-sig">ASSIGN targetLibrary.targetName = sourceLibrary.sourceName</div>
+      <p class="api-desc">Copies a variable from one library to another via two TCP round-trips (GET + SET).</p>
+      <div class="code-block">ASSIGN test.result = add.output
+ASSIGN opsl.consoleLog = ifJS.number</div>
+    </div>
+
+    <div class="api-item">
+      <h3>CALL <span class="badge badge-orange">Execute</span></h3>
+      <div class="api-sig">CALL library.functionName</div>
+      <p class="api-desc">Executes a function. For JS libraries: routes via TCP. For OPSL libraries: executes nested .opsl file.</p>
+      <div class="code-block">CALL test.sayHello
+CALL greeting.showMessage
+CALL opsl.functionCall     ← special: dynamic dispatch</div>
+    </div>
+
+    <h2 id="config">Configuration Variables</h2>
+    <table>
+      <tr><th>Variable</th><th>Default</th><th>File</th><th>Purpose</th></tr>
+      <tr><td><code>SERVER_PORT</code></td><td>3000</td><td>tcp-workers.js, server-manager.js</td><td>Main TCP server port</td></tr>
+      <tr><td><code>START_PORT</code></td><td>4000</td><td>tcp-workers.js</td><td>First library port</td></tr>
+      <tr><td><code>READY_TIMEOUT</code></td><td>5000</td><td>tcp-workers.js</td><td>Max ms to wait for library ready signal</td></tr>
+      <tr><td><code>READY_MARKER</code></td><td>"loaded and registered"</td><td>tcp-workers.js</td><td>String that signals library is ready</td></tr>
+      <tr><td><code>STARTUP_WAIT</code></td><td>500</td><td>server-manager.js</td><td>ms to wait after spawning TCP server</td></tr>
+    </table>
+
+    <h2 id="file-structure">File Structure</h2>
+    <table>
+      <tr><th>Path</th><th>Lines</th><th>Purpose</th></tr>
+      <tr><td><code>parser.js</code></td><td>~100</td><td>Parse OPSL lines → instruction objects</td></tr>
+      <tr><td><code>tcp-workers.js</code></td><td>~150</td><td>Persistent socket + process spawning</td></tr>
+      <tr><td><code>runtimeTCP/main.js</code></td><td>~55</td><td>Entry point: cleanup → start → run → cleanup</td></tr>
+      <tr><td><code>runtimeTCP/runtime.js</code></td><td>~60</td><td>Runtime class: ties modules together</td></tr>
+      <tr><td><code>runtimeTCP/server-manager.js</code></td><td>~55</td><td>Start/stop TCP server</td></tr>
+      <tr><td><code>runtimeTCP/library-loader.js</code></td><td>~40</td><td>Find .js files, create workers</td></tr>
+      <tr><td><code>runtimeTCP/instruction-handler.js</code></td><td>~95</td><td>Process each instruction type</td></tr>
+      <tr><td><code>runtimeTCP/opsl-executor.js</code></td><td>~55</td><td>Execute nested .opsl files</td></tr>
+      <tr><td><code>runtimeTCP/cleanup.js</code></td><td>~25</td><td>Shutdown all processes</td></tr>
+      <tr><td><code>tcp-server-v3/server/</code></td><td>6 files</td><td>TCP server: index, handler, parser, registry, protocol, remote-call</td></tr>
+      <tr><td><code>tcp-server-v3/client/</code></td><td>6 files</td><td>Client API: api, connection, local-server, protocol, responses, index</td></tr>
+      <tr><td><code>native-library/library.js</code></td><td>~50</td><td>Dynamic function dispatch</td></tr>
+      <tr><td><code>start-tcp-server.js</code></td><td>~90</td><td>Standalone server starter</td></tr>
+    </table>
+
+    <h2 id="error-handling">Error Handling</h2>
+    <h4>Graceful degradation</h4>
+    <ul>
+      <li><strong>Missing libraries:</strong> Instruction handlers check <code>importedLibraries[name]</code> and return early if not found</li>
+      <li><strong>Missing OPSL files:</strong> <code>executeOPSLFunction()</code> logs "file not found" and returns</li>
+      <li><strong>Already-exited processes:</strong> All <code>kill()</code> calls wrapped in try/catch</li>
+      <li><strong>Port conflicts:</strong> <code>fuser -k</code> runs before each spawn, silencing errors with <code>2>/dev/null</code></li>
+      <li><strong>Ready timeout:</strong> <code>Promise.race([readyPromise, timeoutPromise])</code> prevents infinite hangs</li>
+      <li><strong>TCP connection drops:</strong> <code>runtimeSocket = null</code> on error, next request triggers reconnect</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

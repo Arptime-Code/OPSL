@@ -1,0 +1,21 @@
+IMPORT [js] test
+
+IMPORT [opsl] helloOPSL
+
+IMPORT [opsl] greetingOPSL
+
+IMPORT [js] greeting
+
+
+
+VARIABLE test.newVar = "helloWorld"
+
+ASSIGN test.thisString = test.hellio
+
+CALL test.sayHello
+
+
+CALL greeting.showMessage
+
+
+CALL greetingOPSL.greeted

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture Flow — OPSL</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050a14;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--red:#ef4444;--pink:#ec4899;--cyan:#06b6d4;--yellow:#eab308;--font:'Inter',system-ui,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:48px;background:rgba(5,10,20,0.95);border-bottom:1px solid #1e293b;display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
+nav .logo{font-weight:700;font-size:13px;color:var(--accent)}
+nav a{color:var(--text2);text-decoration:none;font-size:11px;font-weight:500;padding:5px 8px;border-radius:4px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+#canvas-container{flex:1;position:relative;overflow:hidden;cursor:grab}
+#canvas-container:active{cursor:grabbing}
+canvas{display:block}
+#detail{position:fixed;right:12px;top:64px;width:360px;max-height:calc(100vh - 80px);background:#0d1525;border:1px solid #1e293b;border-radius:8px;padding:16px;overflow-y:auto;display:none;z-index:50;box-shadow:0 16px 48px rgba(0,0,0,0.5)}
+#detail h2{font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+#detail .cat{font-size:8px;padding:2px 5px;border-radius:3px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+#detail p{font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:6px}
+#detail h4{font-size:10px;color:var(--accent);margin:6px 0 3px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+#detail ul{list-style:none;padding:0}
+#detail ul li{font-size:9px;color:var(--text2);padding:1px 0;padding-left:10px;position:relative;line-height:1.4}
+#detail ul li::before{content:'›';position:absolute;left:0;color:var(--accent);font-weight:700}
+#detail .ci{display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:4px;cursor:pointer;transition:background 0.12s;font-size:10px;margin:1px 0}
+#detail .ci:hover{background:rgba(59,130,246,0.1)}
+#detail .cd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+#sidebar{position:fixed;left:12px;top:64px;z-index:50;display:flex;flex-direction:column;gap:2px;width:160px}
+#sidebar .lvl{padding:5px 8px;border-radius:4px;border:1px solid #1e293b;background:rgba(13,21,37,0.9);color:var(--text2);font-size:9px;cursor:pointer;transition:all 0.12s;text-align:left;font-weight:500}
+#sidebar .lvl:hover{border-color:var(--accent);color:var(--text)}
+#sidebar .lvl.active{background:rgba(59,130,246,0.15);border-color:var(--accent);color:var(--accent)}
+#search-box{position:fixed;left:12px;top:260px;z-index:50}
+#search-box input{background:rgba(13,21,37,0.9);border:1px solid #1e293b;border-radius:4px;padding:6px 8px;color:var(--text);font-size:10px;width:160px;outline:none}
+#search-box input:focus{border-color:var(--accent)}
+#zoom-controls{position:fixed;right:12px;bottom:12px;display:flex;gap:3px;z-index:50}
+#zoom-controls button{width:26px;height:26px;border-radius:4px;border:1px solid #1e293b;background:rgba(13,21,37,0.9);color:var(--text);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+#zoom-controls button:hover{border-color:var(--accent)}
+#legend{position:fixed;left:12px;bottom:12px;background:rgba(13,21,37,0.9);border:1px solid #1e293b;border-radius:5px;padding:8px 10px;z-index:50}
+#legend h4{font-size:8px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px}
+#legend .li{display:flex;align-items:center;gap:4px;font-size:9px;padding:1px 0}
+#legend .ld{width:5px;height:5px;border-radius:50%}
+#stats{position:fixed;right:12px;top:64px;z-index:50;font-size:9px;color:var(--text2);background:rgba(13,21,37,0.9);border:1px solid #1e293b;border-radius:4px;padding:3px 6px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Flow</div>
+  <a href="index.html">Home</a>
+  <a href="architecture.html" class="active">Architecture Flow</a>
+  <a href="data-flow.html">Data Flow</a>
+  <a href="concepts.html">Concepts</a>
+  <a href="code-explorer.html">Code Explorer</a>
+  <a href="file-tree.html">File Tree</a>
+</nav>
+<div id="canvas-container"><canvas id="canvas"></canvas></div>
+<div id="sidebar"></div>
+<div id="search-box"><input type="text" placeholder="Search..." oninput="searchNodes(this.value)"></div>
+<div id="zoom-controls">
+  <button onclick="zoomIn()">+</button>
+  <button onclick="zoomOut()">−</button>
+  <button onclick="resetView()">⟳</button>
+</div>
+<div id="legend">
+  <h4>Categories</h4>
+  <div class="li"><div class="ld" style="background:#a855f7"></div>System</div>
+  <div class="li"><div class="ld" style="background:#3b82f6"></div>Core Logic</div>
+  <div class="li"><div class="ld" style="background:#22c55e"></div>Communication</div>
+  <div class="li"><div class="ld" style="background:#f59e0b"></div>Data</div>
+  <div class="li"><div class="ld" style="background:#ec4899"></div>Process</div>
+  <div class="li"><div class="ld" style="background:#06b6d4"></div>Files</div>
+</div>
+<div id="detail">
+  <h2><span id="d-icon" style="font-size:16px"></span><span id="d-title"></span><span class="cat" id="d-cat"></span></h2>
+  <p id="d-desc"></p>
+  <div id="d-section"></div>
+  <div style="margin-top:6px;padding-top:6px;border-top:1px solid #1e293b"><h4>Connected To</h4><div id="d-conns"></div></div>
+</div>
+<div id="stats"></div>
+
+<script>
+// ============================
+// NODES organized into FLOW BOXES
+// Each node has: bx = box it belongs to (for grouping)
+// ============================
+var NODES = [
+  // === BOX: ROOT ===
+  {id:"root",label:"OPSL System",box:"root",color:"#a855f7",x:0,y:-600,w:200,h:60,
+   desc:"A multi-language execution framework. Write scripts in a custom DSL that orchestrate code across JavaScript, Python, C, and OPSL libraries — all communicating through TCP.",
+   details:["Custom DSL: IMPORT, VARIABLE, ASSIGN, CALL","Each library = separate Node.js process","Central TCP server routes messages","~0.06ms per instruction"],
+   conns:["box-parsing","box-execution","box-tcp","box-process","box-data"]},
+
+  // === BOX: TEXT PARSING ===
+  {id:"box-parsing",label:"① Text Parsing",box:"root",color:"#3b82f6",x:-700,y:-350,w:400,h:380,
+   desc:"Converts raw .opsl text into structured instruction objects. No regex — just string replacement and splitting.",isBox:true},
+
+  {id:"read-file",label:"Read .opsl File",box:"box-parsing",color:"#3b82f6",x:-700,y:-480,w:120,h:30,
+   desc:"fs.readFileSync(inputFile, 'utf8') loads the entire OPSL script into memory as one string.",
+   details:["Single string with all lines","UTF-8 encoding","Blocking read — OK for startup"],
+   conns:["split-lines"]},
+
+  {id:"split-lines",label:"Split into Lines",box:"box-parsing",color:"#3b82f6",x:-700,y:-420,w:120,h:30,
+   desc:"fileString.split('\\n') breaks the script into individual instruction lines.",
+   details:["Array of strings","One per line","Empty lines included"],
+   conns:["trim-line","empty-skip"]},
+
+  {id:"trim-line",label:"Trim Whitespace",box:"box-parsing",color:"#3b82f6",x:-700,y:-360,w:120,h:30,
+   desc:"lineInput.trim() removes leading/trailing spaces for consistent parsing.",
+   details:["'  CALL test.hello  ' → 'CALL test.hello'","Ensures startsWith() works"],
+   conns:["keyword-check"]},
+
+  {id:"empty-skip",label:"Skip Empty Lines",box:"box-parsing",color:"#3b82f6",x:-700,y:-300,w:120,h:30,
+   desc:"Lines that produce no valid instruction return empty objects and are processed harmlessly.",
+   details:["Returns {}","No type property","Runtime ignores them"],
+   conns:[]},
+
+  {id:"keyword-check",label:"Check Keyword",box:"box-parsing",color:"#3b82f6",x:-700,y:-240,w:120,h:30,
+   desc:"startsWith() checks for IMPORT, ASSIGN, VARIABLE, or CALL. Unrecognized lines are ignored.",
+   details:["4 keywords recognized","Order doesn't matter (all checked)"],
+   conns:["splitBy-delims"]},
+
+  {id:"splitBy-delims",label:"splitBy() Normalizes Delimiters",box:"box-parsing",color:"#3b82f6",x:-500,y:-480,w:160,h:30,
+   desc:"Replaces each delimiter type (spaces, dots, brackets, equals, quotes) with '|', then splits.",
+   details:["replaceAll(' ', '|'), replaceAll('.', '|'), etc.","split('|') produces token array"],
+   conns:["extract-import","extract-assign","extract-variable","extract-call"]},
+
+  {id:"extract-import",label:"Extract IMPORT Fields",box:"box-parsing",color:"#3b82f6",x:-500,y:-410,w:160,h:30,
+   desc:"IMPORT [js] test → {type:'IMPORT', lang:'js', library:'test'}. Brackets and spaces are delimiters.",
+   details:["lang at index 2","library at index 4"],
+   conns:[]},
+
+  {id:"extract-assign",label:"Extract ASSIGN Fields",box:"box-parsing",color:"#3b82f6",x:-500,y:-340,w:160,h:30,
+   desc:"ASSIGN test.result = add.output → {type:'ASSIGN', library:'test', name:'result', libraryValue:'add', variableValue:'output'}.",
+   details:["5 fields: target lib, target name, source lib, source var"],
+   conns:[]},
+
+  {id:"extract-variable",label:"Extract VARIABLE Fields",box:"box-parsing",color:"#3b82f6",x:-500,y:-270,w:160,h:30,
+   desc:"VARIABLE test.x = \"hello\" → {type:'VARIABLE', library:'test', name:'x', value:'hello'}. Quotes stripped.",
+   details:["Value between quote marks","Left side split for lib.name"],
+   conns:[]},
+
+  {id:"extract-call",label:"Extract CALL Fields",box:"box-parsing",color:"#3b82f6",x:-500,y:-200,w:160,h:30,
+   desc:"CALL test.sayHello → {type:'CALL', library:'test', name:'sayHello'}. Dot separates library from function.",
+   details:["library at index 1","function name at index 2"],
+   conns:[]},
+
+  // === BOX: INSTRUCTION EXECUTION ===
+  {id:"box-execution",label:"② Instruction Execution",box:"root",color:"#3b82f6",x:-150,y:-350,w:300,h:380,
+   desc:"The runtime walks through parsed instructions one by one, dispatching each to the right handler.",isBox:true},
+
+  {id:"loop-instructions",label:"Loop Through Lines",box:"box-execution",color:"#3b82f6",x:-150,y:-480,w:120,h:30,
+   desc:"for loop iterates through parsed lines. Each line becomes an instruction object via parser.parseLine().",
+   details:["parser.parseLine(lines[i])","Sequential execution","await ensures order"],
+   conns:["switch-dispatch"]},
+
+  {id:"switch-dispatch",label:"Switch: Route by Type",box:"box-execution",color:"#3b82f6",x:-150,y:-410,w:120,h:30,
+   desc:"switch(instruction.type) dispatches to handleImport, handleVariable, handleAssign, or handleCall.",
+   details:["4 cases + default","Each handler is async","Sequential: await each"],
+   conns:["handle-import","handle-variable","handle-assign","handle-call"]},
+
+  {id:"handle-import",label:"IMPORT Handler",box:"box-execution",color:"#3b82f6",x:-150,y:-340,w:120,h:30,
+   desc:"Checks if already imported → finds .js file → spawns process → waits for ready → stores in globalLibraries.",
+   details:["Skip if already imported","Finds file on disk","Spawns 'node file.js'"],
+   conns:["find-js-file","spawn-process"]},
+
+  {id:"handle-variable",label:"VARIABLE Handler",box:"box-execution",color:"#3b82f6",x:-150,y:-270,w:120,h:30,
+   desc:"Looks up worker → sends TCP set request → server stores value.",
+   details:["tcpWorkerLib.setVariable(worker, name, value)","One TCP round-trip"],
+   conns:["tcp-set-var"]},
+
+  {id:"handle-assign",label:"ASSIGN Handler",box:"box-execution",color:"#3b82f6",x:-150,y:-200,w:120,h:30,
+   desc:"GETs value from source library via TCP → SETs value into target library via TCP.",
+   details:["Two TCP round-trips","OPSL libs skipped"],
+   conns:["tcp-get-var","tcp-set-var","cross-lib-copy"]},
+
+  {id:"handle-call",label:"CALL Handler",box:"box-execution",color:"#3b82f6",x:-150,y:-130,w:120,h:30,
+   desc:"Checks for special cases (functionCall, consoleLog) → if OPSL: nested execution → if JS: TCP function call.",
+   details:["Special: functionCall → dynamic dispatch","Special: consoleLog → print variable","OPSL → nested .opsl file","JS → TCP remote call"],
+   conns:["special-calls","nested-opsel","tcp-fn-call"]},
+
+  {id:"find-js-file",label:"Find Library File",box:"box-execution",color:"#3b82f6",x:0,y:-480,w:120,h:30,
+   desc:"Searches project root first (name.js), then opsl-local/name/name.js. Root takes priority.",
+   details:["path.join(baseDir, name+'.js')","path.join(baseDir, 'opsl-local', name, name+'.js')"],
+   conns:["spawn-process"]},
+
+  {id:"spawn-process",label:"Spawn Node Process",box:"box-execution",color:"#3b82f6",x:0,y:-410,w:120,h:30,
+   desc:"spawn('node', [filePath]) starts the library as a separate Node.js process with piped stdio.",
+   details:["stdio: ['pipe','pipe','pipe']","Separate memory and event loop"],
+   conns:["wait-ready"]},
+
+  {id:"wait-ready",label:"Wait for Ready Signal",box:"box-execution",color:"#3b82f6",x:0,y:-340,w:120,h:30,
+   desc:"Listens to stdout for 'loaded and registered'. Promise.race with 5s timeout.",
+   details:["stdout.on('data') accumulates buffer","Event-driven, not polling","5000ms timeout fallback"],
+   conns:[]},
+
+  {id:"special-calls",label:"Special Calls",box:"box-execution",color:"#3b82f6",x:0,y:-130,w:120,h:30,
+   desc:"CALL opsl.functionCall reads functionVar, parses 'lib.func', executes dynamically. CALL opsl.consoleLog prints a variable.",
+   details:["functionCall: dynamic dispatch","consoleLog: print variable to console"],
+   conns:["dyn-dispatch"]},
+
+  {id:"nested-opsel",label:"Nested OPSL Execution",box:"box-execution",color:"#3b82f6",x:0,y:-60,w:120,h:30,
+   desc:"Creates new Runtime instance that shares parent's importedLibraries. Reads and processes the nested .opsl file.",
+   details:["new Runtime(baseFilePath)","Shares importedLibraries","Recursive execution"],
+   conns:[]},
+
+  {id:"tcp-fn-call",label:"TCP Function Call",box:"box-execution",color:"#3b82f6",x:0,y:10,w:120,h:30,
+   desc:"Sends 'call' action to TCP server → server routes to library's local server → library executes → returns result.",
+   details:["tcpWorkerLib.executeFunction(worker, name)"],
+   conns:["tcp-remote-call"]},
+
+  {id:"dyn-dispatch",label:"Dynamic Dispatch",box:"box-execution",color:"#3b82f6",x:0,y:80,w:120,h:30,
+   desc:"native-library/library.js parses 'library.functionName' and routes to OPSL nested execution or JS TCP call.",
+   details:["functionString.split('.')","Checks if library is OPSL or JS"],
+   conns:[]},
+
+  // === BOX: TCP COMMUNICATION ===
+  {id:"box-tcp",label:"③ TCP Communication",box:"root",color:"#22c55e",x:300,y:-350,w:500,h:380,
+   desc:"Central server on port 3000 routes messages between library clients. One persistent socket from runtime for speed.",isBox:true},
+
+  {id:"persistent-socket",label:"Persistent Runtime Socket",box:"box-tcp",color:"#22c55e",x:300,y:-480,w:160,h:30,
+   desc:"ONE TCP connection opened once, reused for every instruction. Lazy initialized. 1600× faster than reconnecting.",
+   details:["getRuntimeSocket() — creates once","Single data handler parses responses","pendingRequests map matches IDs","~0.06ms per instruction"],
+   conns:["tcp-set-var","tcp-get-var","tcp-remote-call","send-req","recv-resp"]},
+
+  {id:"tcp-set-var",label:"SET Variable via TCP",box:"box-tcp",color:"#22c55e",x:300,y:-410,w:160,h:30,
+   desc:"Sends 'id:lib:set:key:value' to server. Server stores in client.values[key] = value. Responds 'id:ok'.",
+   details:["One round-trip","Value always a string"],
+   conns:["server-store"]},
+
+  {id:"tcp-get-var",label:"GET Variable via TCP",box:"box-tcp",color:"#22c55e",x:300,y:-340,w:160,h:30,
+   desc:"Sends 'id:lib:get:key'. Server responds with stored value or empty string.",
+   details:["client.values[key] || ''","One round-trip"],
+   conns:["server-retrieve"]},
+
+  {id:"tcp-remote-call",label:"Remote Function Call via TCP",box:"box-tcp",color:"#22c55e",x:300,y:-270,w:160,h:30,
+   desc:"Sends 'call' action → server looks up target port → connects to target's local server → sends 'call:fnName:args' → waits for result.",
+   details:["Two TCP connections involved","Server acts as router"],
+   conns:["server-route","local-server-exec"]},
+
+  {id:"send-req",label:"Send Request",box:"box-tcp",color:"#22c55e",x:480,y:-480,w:140,h:30,
+   desc:"Formats message as 'id:name:action:key[:value]\\n', stores resolve function in pendingRequests, writes to socket.",
+   details:["nextRequestId++","pendingRequests[id] = resolve","socket.write(msg+'\\n')"],
+   conns:["msg-format"]},
+
+  {id:"recv-resp",label:"Receive Response",box:"box-tcp",color:"#22c55e",x:480,y:-410,w:140,h:30,
+   desc:"Buffers incoming data, splits on newlines, parses 'id:data', finds matching pending request, resolves promise.",
+   details:["buffer += chunk","split('\\n'), keep incomplete","find id, call resolve(id)"],
+   conns:["buf-split","colon-parse","promise-resolve"]},
+
+  {id:"msg-format",label:"Message Format",box:"box-tcp",color:"#22c55e",x:480,y:-340,w:140,h:30,
+   desc:"Request: id:name:action:key[:value]\\n | Response: id:data\\n | Newline-delimited, colon-separated.",
+   details:["5 actions: init, set, get, reg, call","All values are strings"],
+   conns:["server-5-actions"]},
+
+  {id:"buf-split",label:"Buffer Splitting",box:"box-tcp",color:"#22c55e",x:480,y:-270,w:140,h:30,
+   desc:"Incomplete messages stay in buffer. Only complete lines (ending with \\n) are processed.",
+   details:["lines = buffer.split('\\n')","buffer = lines.pop()","Process all except last"],
+   conns:[]},
+
+  {id:"colon-parse",label:"Colon Parsing",box:"box-tcp",color:"#22c55e",x:650,y:-480,w:120,h:30,
+   desc:"First colon splits requestId from data: reqId = line.substring(0, ci), data = line.substring(ci+1).",
+   details:["indexOf(':')","substring for ID and data"],
+   conns:[]},
+
+  {id:"promise-resolve",label:"Promise Resolution",box:"box-tcp",color:"#22c55e",x:650,y:-410,w:120,h:30,
+   desc:"pendingRequests[reqId](data) unblocks the original await. Entry deleted to prevent memory leaks.",
+   details:["resolve(data)","delete pendingRequests[reqId]"],
+   conns:[]},
+
+  {id:"server-5-actions",label:"Server: 5 Actions",box:"box-tcp",color:"#22c55e",x:650,y:-340,w:120,h:30,
+   desc:"init (store port), set (store value), get (retrieve value), reg (register function), call (route to target).",
+   details:["handler.js switches on action","Each action has specific logic"],
+   conns:["server-store","server-retrieve","server-route","server-reg"]},
+
+  {id:"server-store",label:"Server: Store Value",box:"box-tcp",color:"#22c55e",x:650,y:-270,w:120,h:30,
+   desc:"client.values[key] = extra. Simple object assignment. No validation, no type conversion.",
+   details:["All values are strings"],
+   conns:[]},
+
+  {id:"server-retrieve",label:"Server: Retrieve Value",box:"box-tcp",color:"#22c55e",x:650,y:-200,w:120,h:30,
+   desc:"Responds with client.values[key] || ''. Returns empty string if key doesn't exist.",
+   details:["|| '' fallback"],
+   conns:[]},
+
+  {id:"server-route",label:"Server: Route Function Call",box:"box-tcp",color:"#22c55e",x:520,y:-140,w:160,h:30,
+   desc:"Looks up target port from registry → net.connect(port) → sends 'call:fnName:args' → reads result → responds to caller.",
+   details:["remote-call.js handles this","New connection per call"],
+   conns:["local-server-exec","client-reg"]},
+
+  {id:"server-reg",label:"Server: Register Function",box:"box-tcp",color:"#22c55e",x:520,y:-70,w:160,h:30,
+   desc:"Adds function name to client.functions[] if not already present. Only stores name, not the function itself.",
+   details:["if (!includes(key)) push","Prevents duplicates"],
+   conns:["client-reg"]},
+
+  {id:"local-server-exec",label:"Local Server Execution",box:"box-tcp",color:"#22c55e",x:520,y:0,w:160,h:30,
+   desc:"Each library's local server receives 'call:fnName:args', looks up function, executes it, writes result back.",
+   details:["net.createServer on unique port","Executes fn(...args)","Writes result+'\\n', closes"],
+   conns:[]},
+
+  {id:"client-reg",label:"Client-Side Registry",box:"box-tcp",color:"#22c55e",x:700,y:-140,w:100,h:30,
+   desc:"Library stores functions in local object: functions[name] = fn. Server also records the name.",
+   details:["Local object + server record","Two registries per function"],
+   conns:[]},
+
+  {id:"cross-lib-copy",label:"Cross-Library Variable Copy",box:"box-tcp",color:"#22c55e",x:380,y:-140,w:120,h:30,
+   desc:"ASSIGN = GET from source (TCP) + SET to target (TCP). Two round-trips through the server.",
+   details:["GET sourceLib.var → value","SET targetLib.name = value"],
+   conns:["tcp-get-var","tcp-set-var"]},
+
+  // === BOX: PROCESS MANAGEMENT ===
+  {id:"box-process",label:"④ Process Management",box:"root",color:"#ec4899",x:-700,y:150,w:300,h:220,
+   desc:"Each JS library runs as 'node library.js' — completely isolated with its own memory and event loop.",isBox:true},
+
+  {id:"kill-old-procs",label:"Kill Old Processes",box:"box-process",color:"#ec4899",x:-700,y:40,w:120,h:30,
+   desc:"Before each run and before each library spawn, 'fuser -k PORT/tcp' kills anything using known ports.",
+   details:["execSync('fuser -k ... 2>/dev/null')","Silent on failure","Prevents EADDRINUSE"],
+   conns:[]},
+
+  {id:"port-allocation",label:"Port Allocation",box:"box-process",color:"#ec4899",x:-550,y:40,w:120,h:30,
+   desc:"Each library gets unique port starting from 4000, incrementing per import. Server always on 3000.",
+   details:["nextPort starts at 4000","nextPort++ per worker","Library uses port for local server"],
+   conns:[]},
+
+  {id:"stdout-pipe",label:"Stdout Piping",box:"box-process",color:"#ec4899",x:-700,y:110,w:120,h:30,
+   desc:"stdio: ['pipe','pipe','pipe'] captures stdout/stderr. Runtime reads library's console output.",
+   details:["childProcess.stdout.on('data')","Forwarded to parent console","stderr logged as errors"],
+   conns:["ready-signal"]},
+
+  {id:"ready-signal",label:"Ready Signal Detection",box:"box-process",color:"#ec4899",x:-550,y:110,w:120,h:30,
+   desc:"Runtime waits for 'loaded and registered' in stdout. Event-driven, not polling. 5s timeout fallback.",
+   details:["buffer.indexOf('loaded and registered')","Promise.race with timeout"],
+   conns:[]},
+
+  {id:"proc-kill",label:"Process Kill on Cleanup",box:"box-process",color:"#ec4899",x:-700,y:180,w:120,h:30,
+   desc:"worker.childProcess.kill() sends SIGTERM. Try/catch for already-exited processes.",
+   details:["Immediate termination","No graceful signal"],
+   conns:[]},
+
+  {id:"server-proc-kill",label:"Server Process Kill",box:"box-process",color:"#ec4899",x:-550,y:180,w:120,h:30,
+   desc:"process.kill(-pid) kills entire process group (server + any children). Enabled by detached: true.",
+   details:["Negative PID = process group","detached: true required"],
+   conns:[]},
+
+  // === BOX: DATA MANAGEMENT ===
+  {id:"box-data",label:"⑤ Data Management",box:"root",color:"#f59e0b",x:-250,y:150,w:500,h:220,
+   desc:"Variables stored on TCP server under library namespaces. Cross-library copying via ASSIGN. Functions registered for remote calls.",isBox:true},
+
+  {id:"string-values",label:"String-Only Values",box:"box-data",color:"#f59e0b",x:-250,y:40,w:140,h:30,
+   desc:"All values on the TCP server are strings. No type conversion. Numbers stay as '10', not 10.",
+   details:["No JSON parse/stringify","Libraries convert types themselves","String(Number(x)+1) for math"],
+   conns:["in-fn-update","in-fn-read"]},
+
+  {id:"in-fn-update",label:"In-Function Variable Updates",box:"box-data",color:"#f59e0b",x:-250,y:110,w:140,h:30,
+   desc:"Functions must call TCPClient.set() to update the server. Local-only changes are invisible to other libs.",
+   details:["number = String(Number(number)+1)","await TCPClient.set('number',number)","Without set(), server has old value"],
+   conns:["tcp-set-var"]},
+
+  {id:"in-fn-read",label:"In-Function Variable Reads",box:"box-data",color:"#f59e0b",x:-250,y:180,w:140,h:30,
+   desc:"Functions call TCPClient.get() for latest values. Local variables may be stale if other libs updated via ASSIGN.",
+   details:["number = await TCPClient.get('number')","Ensures latest from server"],
+   conns:["tcp-get-var"]},
+
+  {id:"fn-registry",label:"Function Registry",box:"box-data",color:"#f59e0b",x:-50,y:40,w:120,h:30,
+   desc:"Libraries register functions with both local object and server. Server records name, local stores actual fn.",
+   details:["registerFunction(name, fn)","Local: functions[name]=fn","Server: client.functions.push(name)"],
+   conns:["local-server-exec"]},
+
+  {id:"request-tracking",label:"Request Tracking",box:"box-data",color:"#f59e0b",x:-50,y:110,w:120,h:30,
+   desc:"Each request gets unique incrementing ID. Responses matched back to requests by ID via pendingRequests map.",
+   details:["nextRequestId++","pendingRequests[id]=resolve","Resolve + delete on response"],
+   conns:["send-req","recv-resp"]},
+
+  {id:"lib-code",label:"Library Code Pattern",box:"box-data",color:"#f59e0b",x:100,y:40,w:140,h:30,
+   desc:"Every JS library: require TCPClient → init(name,port) → registerFunction() → set() → print ready.",
+   details:["const TCPClient = require('tcp-server-v3/client')","async IIFE or main()","TCPClient.init('name', port)"],
+   conns:["fn-registry","in-fn-update","in-fn-read"]},
+
+  {id:"lib-init-pattern",label:"Library Init Pattern",box:"box-data",color:"#f59e0b",x:100,y:110,w:140,h:30,
+   desc:"TCPClient.init(name, port) starts local TCP server + connects to main server + sends 'init' action.",
+   details:["Local server for receiving calls","Connection to main server","Register port with server"],
+   conns:["local-server-exec","persistent-socket"]},
+
+  {id:"lib-call-remote",label:"Library callRemote",box:"box-data",color:"#f59e0b",x:100,y:180,w:140,h:30,
+   desc:"TCPClient.callRemote(target, fn, ...args) sends call through server to target's local server.",
+   details:["callData = fn+':'+args.join(',')","send('call', target, callData)"],
+   conns:["tcp-remote-call"]},
+
+  // === BOX: FILE REFERENCES (bottom) ===
+  {id:"box-files",label:"⑥ File References",box:"root",color:"#06b6d4",x:400,y:150,w:380,h:220,
+   desc:"Actual source files. Click any to see its code.",isBox:true},
+
+  {id:"f-parser",label:"parser.js",box:"box-files",color:"#06b6d4",x:420,y:40,w:100,h:24,
+   desc:"parseLine() + splitBy(). ~40 lines of pure string manipulation.",
+   details:["parseLine(lineInput)","splitBy(text, ...replacements)","module.exports = { parseLine }"],
+   conns:["splitBy-delims","extract-import"]},
+
+  {id:"f-workers",label:"tcp-workers.js",box:"box-files",color:"#06b6d4",x:550,y:40,w:100,h:24,
+   desc:"Persistent socket + process spawning. ~150 lines.",
+   details:["getRuntimeSocket()","sendRuntimeRequest()","createWorker()","setVariable/getVariable/executeFunction"],
+   conns:["persistent-socket","send-req","spawn-process"]},
+
+  {id:"f-runtime-main",label:"runtimeTCP/main.js",box:"box-files",color:"#06b6d4",x:680,y:40,w:100,h:24,
+   desc:"Entry point: kill old → start server → read .opsl → execute → cleanup.",
+   details:["fuser -k to free ports","serverManager.startServer()","new Runtime().processOPSLString()"],
+   conns:["kill-old-procs","loop-instructions"]},
+
+  {id:"f-server-index",label:"tcp-server-v3/server/index.js",box:"box-files",color:"#06b6d4",x:420,y:100,w:100,h:24,
+   desc:"Creates TCP server on port 3000. One parser per socket.",
+   details:["net.createServer","createParser → handleMessage","server.listen(3000)"],
+   conns:["server-5-actions"]},
+
+  {id:"f-client-api",label:"tcp-server-v3/client/api.js",box:"box-files",color:"#06b6d4",x:550,y:100,w:100,h:24,
+   desc:"Public API: init, set, get, registerFunction, callRemote.",
+   details:["5 public functions","Thin wrappers over protocol layer"],
+   conns:["lib-code","lib-init-pattern","lib-call-remote"]},
+
+  {id:"f-native",label:"native-library/library.js",box:"box-files",color:"#06b6d4",x:680,y:100,w:100,h:24,
+   desc:"Dynamic dispatch: parses 'library.function' strings.",
+   details:["NativeOPSL.callFunction()","Splits on '.'","Routes to OPSL or JS"],
+   conns:["dyn-dispatch"]},
+
+  {id:"f-loop",label:"LoopTest2/loop.opsl",box:"box-files",color:"#06b6d4",x:420,y:160,w:100,h:24,
+   desc:"Example: counting loop 0→1000 using ifJS and add libraries.",
+   details:["Imports ifJS + add","VARIABLE sets return values","functionCall creates the loop"],
+   conns:["special-calls"]},
+
+  {id:"f-server-handler",label:"server/handler.js",box:"box-files",color:"#06b6d4",x:550,y:160,w:100,h:24,
+   desc:"Dispatches init/set/get/reg/call actions.",
+   details:["handleMessage(socket, message)","Switch on action"],
+   conns:["server-5-actions"]},
+
+  {id:"f-server-remote",label:"server/remote-call.js",box:"box-files",color:"#06b6d4",x:680,y:160,w:100,h:24,
+   desc:"Routes function calls between clients via local servers.",
+   details:["net.connect(target.port)","call:fnName:args"],
+   conns:["server-route"]},
+
+  {id:"f-client-local",label:"client/local-server.js",box:"box-files",color:"#06b6d4",x:420,y:220,w:100,h:24,
+   desc:"Local TCP server receives function calls from other clients.",
+   details:["net.createServer on unique port","Executes fn, returns result"],
+   conns:["local-server-exec"]},
+
+  {id:"f-client-conn",label:"client/connection.js",box:"box-files",color:"#06b6d4",x:550,y:220,w:100,h:24,
+   desc:"Persistent TCP connection to main server.",
+   details:["net.connect(3000)","sendRaw(msg)","isConnected()"],
+   conns:["persistent-socket"]},
+
+  {id:"f-client-responses",label:"client/responses.js",box:"box-files",color:"#06b6d4",x:680,y:220,w:100,h:24,
+   desc:"Parses responses, resolves matching promises.",
+   details:["drainResponses(chunk)","registerRequest(id)"],
+   conns:["recv-resp","promise-resolve"]},
+
+  // === ARROW NODES: Flow connectors (invisible but show arrows) ===
+  {id:"arrow-1",label:"↓",box:"root",color:"#64748b",x:0,y:-540,w:10,h:20,isArrow:true,conns:[]},
+  {id:"arrow-2",label:"↓",box:"root",color:"#64748b",x:-550,y:-140,w:10,h:20,isArrow:true,conns:[]},
+  {id:"arrow-3",label:"↓",box:"root",color:"#64748b",x:550,y:-140,w:10,h:20,isArrow:true,conns:[]},
+];
+
+// ============================
+// BOXES: Visual containers
+// ============================
+var BOXES = [
+  {id:"box-parsing",x:-900,y:-520,w:440,h:420,color:"#3b82f6",label:"① Text Parsing",label:"Converts .opsl text → instruction objects"},
+  {id:"box-execution",x:-300,y:-520,w:340,h:660,color:"#3b82f6",label:"② Instruction Execution",sub:"Routes each instruction to its handler"},
+  {id:"box-tcp",x:180,y:-520,w:640,h:660,color:"#22c55e",label:"③ TCP Communication",sub:"Central server + persistent socket + remote calls"},
+  {id:"box-process",x:-900,y:0,w:340,h:240,color:"#ec4899",label:"④ Process Management",sub:"Spawn/kill isolated Node.js processes"},
+  {id:"box-data",x:-400,y:0,w:580,h:240,color:"#f59e0b",label:"⑤ Data Management",sub:"Variable storage, function registry, request tracking"},
+  {id:"box-files",x:340,y:0,w:480,h:280,color:"#06b6d4",label:"⑥ File References",sub:"Source files — click to view code"},
+];
+
+// ============================
+// RENDERING
+// ============================
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var container = document.getElementById('canvas-container');
+var detailEl = document.getElementById('detail');
+var statsEl = document.getElementById('stats');
+
+var scale = 0.7, offsetX = 0, offsetY = 0;
+var dragging = false, dragStart = {x:0,y:0};
+var hoveredNode = null, selectedNode = null;
+var currentLevel = 2;
+
+function resize(){canvas.width=container.clientWidth;canvas.height=container.clientHeight;draw();}
+
+function getVisible(){return NODES.filter(function(n){return !n.isBox && n.box && getBoxLevel(n.box)<=currentLevel;});}
+
+function getBoxLevel(boxId){
+  var node=NODES.find(function(n){return n.id===boxId;});
+  return node?node.lvl||2:2;
+}
+
+function getBoxById(id){return BOXES.find(function(b){return b.id===id;});}
+
+function draw(){
+  var visible=getVisible();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(canvas.width/2+offsetX,canvas.height/2+offsetY);
+  ctx.scale(scale,scale);
+
+  // Draw boxes
+  BOXES.forEach(function(box){
+    var showLevel = box.id==='box-parsing'||box.id==='box-execution'||box.id==='box-tcp'?1:
+                    box.id==='box-process'||box.id==='box-data'?2:
+                    box.id==='box-files'?3:99;
+    if(currentLevel<showLevel-1)return;
+
+    ctx.fillStyle = box.color+'08';
+    ctx.strokeStyle = box.color+'30';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(box.x,box.y,box.w,box.h,12);
+    ctx.fill();
+    ctx.stroke();
+
+    // Label
+    ctx.fillStyle=box.color+'90';
+    ctx.font='600 11px Inter,sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText(box.label,box.x+12,box.y+20);
+    if(box.sub){
+      ctx.fillStyle='#64748b';
+      ctx.font='400 8px Inter,sans-serif';
+      ctx.fillText(box.sub,box.x+12,box.y+32);
+    }
+  });
+
+  // Draw connections
+  visible.forEach(function(n){
+    if(!n.conns)return;
+    n.conns.forEach(function(cid){
+      var t=visible.find(function(x){return x.id===cid;});
+      if(!t)return;
+      var hl=selectedNode&&(selectedNode.id===n.id||selectedNode.id===cid);
+      ctx.strokeStyle=hl?'rgba(59,130,246,0.5)':'rgba(148,163,184,0.08)';
+      ctx.lineWidth=hl?1.5:0.5;
+      ctx.beginPath();
+      ctx.moveTo(n.x,n.y);
+      var dx=t.x-n.x,dy=t.y-n.y;
+      ctx.bezierCurveTo(n.x+dx*0.3,n.y, t.x-dx*0.3,t.y, t.x,t.y);
+      ctx.stroke();
+    });
+  });
+
+  // Draw nodes
+  visible.forEach(function(n){
+    if(n.isArrow)return;
+    var hl=selectedNode&&n.conns&&n.conns.indexOf(selectedNode.id)!==-1;
+    var hov=hoveredNode&&hoveredNode.id===n.id;
+    var w=n.w||120, h=n.h||30;
+
+    if(hov||hl){ctx.shadowColor=n.color;ctx.shadowBlur=12;}
+
+    ctx.fillStyle=hov?n.color+'30':(hl?n.color+'20':n.color+'10');
+    ctx.strokeStyle=hov?n.color:(hl?n.color:n.color+'50');
+    ctx.lineWidth=hov?2:0.8;
+    ctx.beginPath();
+    ctx.roundRect(n.x-w/2,n.y-h/2,w,h,4);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor='transparent';ctx.shadowBlur=0;
+
+    ctx.fillStyle=hov?'#fff':(hl?n.color:'#cbd5e1');
+    ctx.font=(hov?'600':'500')+' '+Math.max(7,9)+'px Inter,sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(n.label,n.x,n.y);
+  });
+
+  ctx.restore();
+  statsEl.textContent=visible.length+' nodes visible';
+}
+
+function getNodeAt(mx,my){
+  var visible=getVisible().filter(function(n){return !n.isArrow;});
+  var wx=(mx-canvas.width/2-offsetX)/scale,wy=(my-canvas.height/2-offsetY)/scale;
+  for(var i=visible.length-1;i>=0;i--){
+    var n=visible[i],w=n.w||120,h=n.h||30;
+    if(wx>=n.x-w/2-4&&wx<=n.x+w/2+4&&wy>=n.y-h/2-4&&wy<=n.y+h/2+4)return n;
+  }
+  return null;
+}
+
+function showDetail(n){
+  selectedNode=n;
+  document.getElementById('d-icon').textContent='●';
+  document.getElementById('d-icon').style.color=n.color;
+  document.getElementById('d-title').textContent=n.label;
+  var cat=document.getElementById('d-cat');
+  cat.textContent=n.box||'';
+  cat.style.background=n.color+'22';cat.style.color=n.color;
+  document.getElementById('d-desc').textContent=n.desc;
+
+  var sec=document.getElementById('d-section');
+  sec.innerHTML='';
+  if(n.details&&n.details.length){
+    sec.innerHTML='<h4>Details</h4><ul>';
+    n.details.forEach(function(d){sec.innerHTML+='<li>'+d+'</li>';});
+    sec.innerHTML+='</ul>';
+  }
+
+  var conns=document.getElementById('d-conns');
+  conns.innerHTML='';
+  if(n.conns){
+    n.conns.forEach(function(cid){
+      var t=NODES.find(function(x){return x.id===cid;});
+      if(!t||t.isArrow)return;
+      var div=document.createElement('div');
+      div.className='ci';
+      div.innerHTML='<div class="cd" style="background:'+t.color+'"></div><span>'+t.label+'</span>';
+      div.addEventListener('click',function(){showDetail(t);});
+      conns.appendChild(div);
+    });
+  }
+  detailEl.style.display='block';
+  draw();
+}
+
+canvas.addEventListener('mousedown',function(e){
+  var n=getNodeAt(e.clientX,e.clientY);
+  if(n)showDetail(n); else{dragging=true;dragStart={x:e.clientX-offsetX,y:e.clientY-offsetY};}
+});
+canvas.addEventListener('mousemove',function(e){
+  if(dragging){offsetX=e.clientX-dragStart.x;offsetY=e.clientY-dragStart.y;draw();return;}
+  var n=getNodeAt(e.clientX,e.clientY);
+  if(n!==hoveredNode){hoveredNode=n;canvas.style.cursor=n?'pointer':'grab';draw();}
+});
+canvas.addEventListener('mouseup',function(){dragging=false;});
+canvas.addEventListener('wheel',function(e){e.preventDefault();scale=Math.max(0.15,Math.min(5,scale*(e.deltaY>0?0.92:1.08)));draw();});
+
+function zoomIn(){scale=Math.min(5,scale*1.2);draw();}
+function zoomOut(){scale=Math.max(0.15,scale*0.8);draw();}
+function resetView(){scale=0.7;offsetX=0;offsetY=0;draw();}
+
+function setLevel(lvl){
+  currentLevel=lvl;
+  document.querySelectorAll('#sidebar .lvl').forEach(function(b,i){b.classList.toggle('active',i===lvl);});
+  detailEl.style.display='none';selectedNode=null;draw();
+}
+
+function searchNodes(q){
+  q=q.toLowerCase();
+  if(!q){selectedNode=null;detailEl.style.display='none';draw();return;}
+  var match=NODES.find(function(n){return n.label.toLowerCase().indexOf(q)!==-1&&!n.isArrow;});
+  if(match){showDetail(match);}
+}
+
+// Build sidebar
+var sb=document.getElementById('sidebar');
+['All Boxes','Core Flow','Data & Process','Files'].forEach(function(name,i){
+  var btn=document.createElement('button');
+  btn.className='lvl'+(i===0?' active':'');
+  btn.textContent='Level '+(i+1)+' — '+name;
+  btn.addEventListener('click',function(){setLevel(i);});
+  sb.appendChild(btn);
+});
+
+window.addEventListener('resize',resize);
+resize();
+</script>
+</body>
+</html>

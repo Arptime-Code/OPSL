@@ -1,0 +1,5 @@
+IMPORT [js] hello
+
+VARIABLE hello.testVar = "TCP_TEST_SUCCESS"
+
+CALL hello.greet

@@ -1,0 +1,10 @@
+IMPORT [js] test
+
+
+CALL test.sayHello
+
+
+VARIABLE greetingOPSL.some = "something"
+
+
+ASSIGN greetingOPSL.some = greetingOPSL.some

@@ -18,7 +18,7 @@ CALL ifJS.ifFunc
 
 
 ASSIGN opsl.consoleLog = ifJS.number
-CALL opsl.consoleLog
+CALL opsl.consoleLogplras
 
 
 ASSIGN add.number = ifJS.number

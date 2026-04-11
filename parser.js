@@ -1,63 +1,109 @@
-function parseLine(lineInput)
-{
-    let instruction = {};
-    
-    let trimmed = lineInput.trim();
-    
-    if(trimmed.startsWith("IMPORT "))
-    {
-        let splitLine = splitBy(trimmed, " ", "[", "]");
+// ========================================
+// parser.js
+// Converts OPSL instruction lines into structured objects
+// ========================================
 
-        let lang = splitLine[2];
-        let library = splitLine[4];
+// Configuration: keywords recognized by the parser
+var IMPORT_KEYWORD = 'IMPORT ';
+var ASSIGN_KEYWORD = 'ASSIGN ';
+var VARIABLE_KEYWORD = 'VARIABLE ';
+var CALL_KEYWORD = 'CALL ';
 
-        instruction = {"type" : "IMPORT", "lang" : lang, "library" : library};
+// Configuration: delimiter sets for each instruction type
+var IMPORT_DELIMS = [' ', '[', ']'];
+var ASSIGN_DELIMS = [' = ', '.', ' '];
+var VARIABLE_DELIMS_LEFT = ['VARIABLE ', '.'];
+var VARIABLE_DELIMS_RIGHT = ['"'];
+var VARIABLE_DELIMS_EQ = [' = '];
+var CALL_DELIMS = ['.', ' '];
+
+// ========================================
+// Main entry point — parse a single OPSL line
+// ========================================
+function parseLine(lineInput) {
+    var instruction = {};
+    var trimmed = lineInput.trim();
+
+    if (trimmed.startsWith(IMPORT_KEYWORD)) {
+        instruction = parseImport(trimmed);
     }
-    if(trimmed.startsWith("ASSIGN "))
-    {
-        let splitLine = splitBy(trimmed, " = ", ".", " ");
-
-        let library = splitLine[1];
-        let name = splitLine[2];
-        let libraryValue = splitLine[3];
-        let variableValue = splitLine[4];
-
-        instruction = {"type" : "ASSIGN", "library" : library, "name" : name, "libraryValue" : libraryValue, "variableValue" : variableValue};
+    if (trimmed.startsWith(ASSIGN_KEYWORD)) {
+        instruction = parseAssign(trimmed);
     }
-    if(trimmed.startsWith("VARIABLE "))
-    {
-        let parts = splitBy(trimmed, " = ");
-        let leftSide = parts[0];
-        let rightSide = parts[1];
-
-        let leftParts = splitBy(leftSide, "VARIABLE ", ".");
-        let library = leftParts[1];
-        let name = leftParts[2];
-
-        let valueParts = splitBy(rightSide, '"');
-        let value = valueParts[1];
-
-        instruction = {"type" : "VARIABLE", "library" : library, "name" : name, "value" : value};
+    if (trimmed.startsWith(VARIABLE_KEYWORD)) {
+        instruction = parseVariable(trimmed);
     }
-    if(trimmed.startsWith("CALL "))
-    {
-        let splitLine = splitBy(trimmed, ".", " ");
-
-        let library = splitLine[1];
-        let name = splitLine[2];
-
-        instruction = {"type" : "CALL", "library" : library, "name" : name};
+    if (trimmed.startsWith(CALL_KEYWORD)) {
+        instruction = parseCall(trimmed);
     }
+
     return instruction;
 }
 
-function splitBy(text, ...replacements) {
-    for (let i = 0; i < replacements.length; i++) {
-        text = text.replaceAll(replacements[i], "|");
+// ========================================
+// Parse IMPORT [lang] library
+// ========================================
+function parseImport(trimmed) {
+    var tokens = splitBy(trimmed, IMPORT_DELIMS);
+    return {
+        type: 'IMPORT',
+        lang: tokens[2],
+        library: tokens[4]
+    };
+}
+
+// ========================================
+// Parse ASSIGN target.name = source.var
+// ========================================
+function parseAssign(trimmed) {
+    var tokens = splitBy(trimmed, ASSIGN_DELIMS);
+    return {
+        type: 'ASSIGN',
+        library: tokens[1],
+        name: tokens[2],
+        libraryValue: tokens[3],
+        variableValue: tokens[4]
+    };
+}
+
+// ========================================
+// Parse VARIABLE lib.name = "value"
+// ========================================
+function parseVariable(trimmed) {
+    var eqParts = splitBy(trimmed, VARIABLE_DELIMS_EQ);
+    var leftTokens = splitBy(eqParts[0], VARIABLE_DELIMS_LEFT);
+    var valueTokens = splitBy(eqParts[1], VARIABLE_DELIMS_RIGHT);
+
+    return {
+        type: 'VARIABLE',
+        library: leftTokens[1],
+        name: leftTokens[2],
+        value: valueTokens[1]
+    };
+}
+
+// ========================================
+// Parse CALL library.functionName
+// ========================================
+function parseCall(trimmed) {
+    var tokens = splitBy(trimmed, CALL_DELIMS);
+    return {
+        type: 'CALL',
+        library: tokens[1],
+        name: tokens[2]
+    };
+}
+
+// ========================================
+// Replace each delimiter with '|', then split
+// ========================================
+function splitBy(text, replacements) {
+    for (var i = 0; i < replacements.length; i++) {
+        text = text.replaceAll(replacements[i], '|');
     }
-    return text.split("|");
+    return text.split('|');
 }
 
 module.exports = {
-    parseLine
-}
+    parseLine: parseLine
+};

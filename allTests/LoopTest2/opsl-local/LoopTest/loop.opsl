@@ -1,0 +1,17 @@
+// Loop file - contains the loop logic
+
+ASSIGN ifJS.number = add.output
+
+CALL ifJS.ifFunc
+
+
+ASSIGN opsl.consoleLog = ifJS.number
+CALL opsl.consoleLog
+
+
+ASSIGN add.number = ifJS.number
+CALL add.add
+
+
+ASSIGN opsl.functionVar = ifJS.output
+CALL opsl.functionCall

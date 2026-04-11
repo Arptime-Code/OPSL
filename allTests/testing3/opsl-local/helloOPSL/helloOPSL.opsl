@@ -1,0 +1,1 @@
+VARIABLE hello.message = "hello from nested opsl"

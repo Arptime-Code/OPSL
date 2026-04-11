@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concepts — OPSL</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--red:#ef4444;--pink:#ec4899;--cyan:#06b6d4;--font:'Inter','Segoe UI',system-ui,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:56px;background:rgba(10,14,23,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;gap:24px;flex-shrink:0}
+nav .logo{font-weight:700;font-size:16px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav a{color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:8px 12px;border-radius:6px;transition:all 0.2s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{flex:1;padding:48px 32px;max-width:800px;margin:0 auto}
+h1{font-size:28px;margin-bottom:8px}
+.subtitle{color:var(--text2);margin-bottom:40px;font-size:14px}
+.cat-tabs{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap}
+.cat-tab{padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.15s}
+.cat-tab:hover{border-color:var(--accent);color:var(--text)}
+.cat-tab.active{background:rgba(59,130,246,0.15);border-color:var(--accent);color:var(--accent)}
+.concept{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;transition:border-color 0.2s}
+.concept:hover{border-color:rgba(59,130,246,0.3)}
+.concept-header{padding:20px 24px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background 0.15s}
+.concept-header:hover{background:rgba(59,130,246,0.05)}
+.concept-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.concept-header h3{flex:1;font-size:15px;font-weight:600}
+.concept-header .badge{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
+.concept-arrow{color:var(--text2);font-size:12px;transition:transform 0.2s}
+.concept-arrow.open{transform:rotate(180deg)}
+.concept-body{display:none;padding:0 24px 24px 72px}
+.concept-body.open{display:block}
+.concept-body p{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.concept-body .analogy{background:rgba(168,85,247,0.1);border-left:3px solid var(--purple);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.concept-body .analogy strong{color:var(--purple)}
+.concept-body .detail{background:var(--card2);border-radius:8px;padding:12px 16px;margin:12px 0}
+.concept-body .detail strong{color:var(--accent)}
+.concept-body code{background:rgba(59,130,246,0.15);padding:2px 6px;border-radius:4px;font-family:'Cascadia Code',monospace;font-size:12px;color:var(--accent)}
+.concept-body .code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'Cascadia Code',monospace;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre;margin:12px 0}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="architecture.html">Architecture Graph</a>
+  <a href="data-flow.html">Data Flow</a>
+  <a href="concepts.html" class="active">Concepts</a>
+  <a href="code-explorer.html">Code Explorer</a>
+  <a href="file-tree.html">File Tree</a>
+</nav>
+<main>
+  <h1>Core Concepts</h1>
+  <p class="subtitle">Understand the ideas behind the code — explained for beginners with analogies.</p>
+
+  <div class="cat-tabs">
+    <div class="cat-tab active" onclick="filterCat('all')">All</div>
+    <div class="cat-tab" onclick="filterCat('core')">Core Engine</div>
+    <div class="cat-tab" onclick="filterCat('tcp')">TCP Communication</div>
+    <div class="cat-tab" onclick="filterCat('process')">Processes</div>
+    <div class="cat-tab" onclick="filterCat('design')">Design Patterns</div>
+  </div>
+
+  <div id="concepts-list"></div>
+</main>
+
+<script>
+var CONCEPTS = [
+  {cat:"core",icon:"📝",color:"#3b82f6",
+   title:"What is OPSL?",
+   short:"A custom scripting language for multi-language orchestration",
+   desc:"OPSL (One Programming/Scripting Language) lets you write a single script that controls code written in JavaScript, Python, C, and even other OPSL files. Instead of choosing one language, you use them all together.",
+   analogy:"Think of OPSL like a conductor of an orchestra. The conductor doesn't play any instrument — they just tell the violinist when to play, the drummer when to hit, and the flutist when to blow. OPSL is the conductor, and your libraries are the musicians.",
+   details:[
+     {label:"The 4 instructions",text:"IMPORT [lang] name — loads a library | VARIABLE lib.var = \"val\" — sets a variable | ASSIGN lib.a = other.b — copies variables between libs | CALL lib.func — executes a function"},
+     {label:"Multi-language support",text:"Each library is tagged with a language: [js], [py], [c], [opsl]. The same OPSL script can mix them all."},
+     {label:"File format",text:"OPSL scripts use the .opsl extension. Each line is one instruction. Blank lines and comments are ignored."}
+   ]},
+
+  {cat:"core",icon:"🔄",color:"#3b82f6",
+   title:"The Runtime Orchestrator",
+   short:"The central coordinator that ties every module together",
+   desc:"runtime-tcp.js (and its 7 modular files in runtimeTCP/) is the brain of OPSL. It reads your .opsl file line by line, parses each instruction, and delegates the actual work to the right module. It doesn't do TCP itself — it tells tcp-workers.js to do that.",
+   analogy:"Like a restaurant manager: takes your order (reads .opsl), tells the kitchen what to cook (tcp-workers.js for TCP, parser.js for text parsing), and serves you the meal (output on screen). The manager doesn't cook — they coordinate.",
+   details:[
+     {label:"Modular split",text:"Instead of one 300-line file, the runtime is now 7 focused files: main.js (entry), runtime.js (class), server-manager.js (TCP server), library-loader.js (finds files), instruction-handler.js (processes instructions), opsl-executor.js (nested OPSL), cleanup.js (shutdown)."},
+     {label:"Global state",text:"globalLibraries = {} stores every imported library. This dictionary is shared across all modules."},
+     {label:"Nested execution",text:"When an OPSL library calls another OPSL function, a new Runtime instance is created that shares the same imported libraries. This creates a tree of nested executions."}
+   ]},
+
+  {cat:"core",icon:"✂️",color:"#3b82f6",
+   title:"Text Parsing with splitBy()",
+   short:"Simple string splitting instead of complex regex",
+   desc:"parser.js doesn't use regular expressions. Instead, the splitBy() helper replaces all delimiters with a common character (|) and then splits. It's simple, readable, and works for OPSL's predictable syntax.",
+   analogy:"Imagine sorting mail by first replacing all commas, dashes, and slashes with a star symbol, then cutting the paper at every star. Much easier than trying to cut at different characters each time.",
+   details:[
+     {label:"How it works",text:"splitBy('CALL test.hello', '.', ' ') → replace '.' with '|' → replace ' ' with '|' → split on '|' → ['CALL','test','hello']"},
+     {label:"Why not regex?",text:"Regex is powerful but hard to read. For OPSL's simple, predictable syntax, string replacement is clearer for beginners."}
+   ]},
+
+  {cat:"tcp",icon:"🔌",color:"#22c55e",
+   title:"Persistent TCP Socket",
+   short:"One connection, reused forever — no reconnecting per instruction",
+   desc:"tcp-workers.js opens ONE TCP connection to the server on port 3000 and keeps it open for the entire execution. Every variable get/set and function call uses this same socket. This is the single biggest performance optimization in the system.",
+   analogy:"Like a phone call. You don't hang up and redial every time you want to say a new sentence — you stay on the line. That's the persistent socket.",
+   details:[
+     {label:"Lazy initialization",text:"getRuntimeSocket() only creates the connection when first needed. After that, it returns the existing socket instantly."},
+     {label:"Request tracking",text:"Each request gets a unique ID (1, 2, 3...). The pendingRequests dictionary maps IDs to their resolve functions. When the server respondss with '5:ok', we find request #5 and resolve it."},
+     {label:"Buffer management",text:"TCP data arrives in chunks. The socketBuffer collects partial data and only processes complete lines (ending with \\n)."},
+     {label:"Speed impact",text:"Without persistent socket: ~100ms per instruction (reconnect each time). With it: ~0.06ms per instruction. That's 1600× faster."}
+   ]},
+
+  {cat:"tcp",icon:"🖥️",color:"#22c55e",
+   title:"TCP Server as Message Router",
+   short:"Central hub on port 3000 that routes all messages between clients",
+   desc:"The TCP server (tcp-server-v3/) is a simple Node.js net.createServer that listens on port 3000. It maintains a registry of clients and routes messages between them. It doesn't execute any code — it only stores data and forwards requests.",
+   analogy:"Like a telephone exchange operator. When you want to call someone, you tell the operator (server), and they connect you to the right person (library). The operator doesn't have your conversation — they just connect the lines.",
+   details:[
+     {label:"Client registry",text:"An in-memory object: {demo1: {values:{name:'Alice'}, functions:['add'], port:3001}, demo2: {...}}"},
+     {label:"Message format",text:"Requests: requestId:name:action:key:value | Responses: requestId:data"},
+     {label:"Actions",text:"init (register client), set (store variable), get (retrieve variable), reg (register function), call (execute remote function)"},
+     {label:"Remote calls",text:"When A calls B's function, the server opens a new TCP connection to B's local server, sends the call, waits for the result, and sends it back to A."}
+   ]},
+
+  {cat:"tcp",icon:"📡",color:"#22c55e",
+   title:"Each Library Is Its Own Process",
+   short:"Every JS library runs as 'node library.js' — completely isolated",
+   desc:"Instead of loading libraries into the same process with eval or require, OPSL spawns each one as a separate child process. Each library has its own memory, event loop, and TCP connection. They communicate only through the TCP server.",
+   analogy:"Like separate offices in a building. Each person (library) has their own room (process), their own phone (TCP connection), and they communicate through the building's intercom system (TCP server).",
+   details:[
+     {label:"Process spawning",text:"spawn('node', [libraryFile]) — literally runs the shell command node /path/to/library.js"},
+     {label:"Ready detection",text:"The runtime listens to each library's stdout. When the library prints 'loaded and registered', the runtime knows it's ready."},
+     {label:"Isolation",text:"Variables in one library can't accidentally affect another. The only way to share data is through explicit TCP messages."},
+     {label:"Port assignment",text:"Each library gets a unique port (4001, 4002, ...) for receiving function calls from other libraries."}
+   ]},
+
+  {cat:"tcp",icon:"📦",color:"#22c55e",
+   title:"TCPClient API",
+   short:"The library-side interface for TCP communication",
+   desc:"Every JS library uses the same client API from tcp-server-v3/client/. It provides 5 simple functions: init(), set(), get(), registerFunction(), and callRemote().",
+   analogy:"Like a universal remote control. Every device (library) uses the same remote (TCPClient) to talk to the TV (server).",
+   details:[
+     {label:"init(name, port)",text:"Starts a local TCP server on the given port and registers this client with the main server."},
+     {label:"set(key, value)",text:"Stores a key-value pair on the server under this client's name."},
+     {label:"get(key)",text:"Retrieves a stored value from the server."},
+     {label:"registerFunction(name, fn)",text:"Makes a function available for remote calls. Other clients can call it via callRemote()."},
+     {label:"callRemote(target, fn, ...args)",text:"Calls a function registered on another client. The server routes the call through the target's local server."}
+   ]},
+
+  {cat:"process",icon:"🧹",color:"#ec4899",
+   title:"Cleanup and Port Management",
+   short:"Killing old processes before starting new ones",
+   desc:"Before each run, OPSL kills any leftover processes on known ports using fuser -k. This prevents 'port already in use' errors from previous incomplete runs.",
+   analogy:"Like closing all browser tabs before reopening the browser — you start fresh, no conflicts.",
+   details:[
+     {label:"Port cleanup",text:"execSync('fuser -k 3000/tcp 4000/tcp ... 2>/dev/null') — kills anything using those ports"},
+     {label:"Graceful shutdown",text:"cleanup.js kills each library's child process and the TCP server process. Try/catch handles cases where processes already exited."},
+     {label:"Fresh server",text:"A new TCP server is started each run. This clears all stored variables from previous runs."}
+   ]},
+
+  {cat:"design",icon:"🏗️",color:"#a855f7",
+   title:"Separation of Concerns",
+   short:"Each file does ONE thing well — modular architecture",
+   desc:"The runtimeTCP/ folder demonstrates clean separation: main.js only orchestrates, runtime.js only coordinates modules, server-manager.js only manages the TCP server, etc. No file does more than its job.",
+   analogy:"Like a car factory assembly line. Each station (file) has one job: install wheels, paint, engine, seats. No station tries to do everything.",
+   details:[
+     {label:"Before: one file",text:"runtime-tcp.js was 330 lines doing everything: server management, library loading, instruction handling, cleanup."},
+     {label:"After: 7 files",text:"main.js (56 lines), runtime.js (60 lines), server-manager.js (56 lines), library-loader.js (40 lines), instruction-handler.js (96 lines), opsl-executor.js (55 lines), cleanup.js (24 lines)."},
+     {label:"Benefits",text:"Easier to understand (each file is small), easier to test (isolated logic), easier to modify (change one file without breaking others)."}
+   ]},
+
+  {cat:"design",icon:"⚡",color:"#a855f7",
+   title:"Performance Optimization",
+   short:"From 100ms per instruction to 0.06ms — how we got 1600× faster",
+   desc:"The biggest speed gains came from eliminating redundant work: one persistent socket instead of reconnecting, event-driven ready detection instead of polling, and minimal startup delays.",
+   details:[
+     {label:"Persistent socket",text:"Saves ~99ms per instruction by not opening/closing TCP connections"},
+     {label:"No polling",text:"Ready detection uses stdout events instead of checking every 100ms"},
+     {label:"Faster startup",text:"500ms server wait instead of 2000ms — ports are freed with fuser -k"},
+     {label:"Result",text:"1000 loop iterations in ~0.7 seconds = ~0.06ms per TCP instruction"}
+   ]}
+];
+
+function renderConcepts(filter) {
+  var container = document.getElementById('concepts-list');
+  container.innerHTML = '';
+  var filtered = filter === 'all' ? CONCEPTS : CONCEPTS.filter(function(c){return c.cat===filter});
+  filtered.forEach(function(c, i) {
+    var catLabel = {core:'Core Engine',tcp:'TCP Communication',process:'Processes',design:'Design Patterns'}[c.cat];
+    var div = document.createElement('div');
+    div.className = 'concept';
+    div.setAttribute('data-cat', c.cat);
+
+    div.innerHTML = '<div class="concept-header" onclick="toggleConcept(this)">' +
+      '<div class="concept-icon" style="background:'+c.color+'22">'+c.icon+'</div>' +
+      '<h3>'+c.title+'</h3>' +
+      '<span class="badge" style="background:'+c.color+'22;color:'+c.color+'">'+catLabel+'</span>' +
+      '<span class="concept-arrow">▼</span></div>' +
+      '<div class="concept-body">' +
+      '<p style="color:var(--text);font-weight:500">'+c.short+'</p>' +
+      '<p>'+c.desc+'</p>' +
+      '<div class="analogy"><strong>Analogy:</strong> '+c.analogy+'</div>';
+
+    c.details.forEach(function(d) {
+      div.querySelector('.concept-body').innerHTML += '<div class="detail"><strong>'+d.label+':</strong> '+d.text+'</div>';
+    });
+
+    div.querySelector('.concept-body').innerHTML += '</div>';
+    container.appendChild(div);
+  });
+}
+
+function toggleConcept(header) {
+  var body = header.nextElementSibling;
+  var arrow = header.querySelector('.concept-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function filterCat(cat) {
+  document.querySelectorAll('.cat-tab').forEach(function(t){t.classList.remove('active')});
+  event.target.classList.add('active');
+  renderConcepts(cat);
+}
+
+renderConcepts('all');
+</script>
+</body>
+</html>
