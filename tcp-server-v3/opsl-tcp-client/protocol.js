@@ -1,18 +1,22 @@
+// ========================================
+// client/protocol.js
 // Build and send request messages to the server
-const { sendRaw } = require('./connection');
-const { registerRequest } = require('./responses');
+// ========================================
 
-let nextRequestId = 0;
+var { sendRaw } = require('./connection');
+var { registerRequest } = require('./responses');
+
+var nextRequestId = 0;
 
 function send(name, action, key, value) {
-  const id = String(++nextRequestId);
-  const promise = registerRequest(id);
+  var id = String(++nextRequestId);
+  var promise = registerRequest(id);
 
-  let msg = id + ':' + name + ':' + action + ':' + key;
+  var msg = id + ':' + name + ':' + action + ':' + key;
   if (value !== undefined) msg += ':' + value;
   sendRaw(msg);
 
   return promise;
 }
 
-module.exports = { send };
+module.exports = { send: send };

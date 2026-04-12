@@ -25,6 +25,7 @@ function getSocket() {
 
     return new Promise(function (resolve, reject) {
         runtimeSocket = net.connect(SERVER_PORT, function () {
+            runtimeSocket.setNoDelay(true);
             resolve(runtimeSocket);
         });
 
@@ -51,7 +52,6 @@ function handleIncomingData(chunk) {
         start = newlineIdx + 1;
     }
 
-    // Remove processed data from buffer
     if (start > 0) {
         socketBuffer = socketBuffer.substring(start);
     }
@@ -77,7 +77,7 @@ function processLine(start, end) {
 }
 
 // ========================================
-// Send a request and wait for response (with tracking)
+// Send a request and wait for response
 // ========================================
 function sendRequest(name, action, key, value) {
     return new Promise(function (resolve) {

@@ -4,6 +4,7 @@ const { handleMessage } = require('./handler');
 
 // Start the main server
 const server = net.createServer(socket => {
+  socket.setNoDelay(true);
   const onData = createParser(message => {
     handleMessage(socket, message);
   });

@@ -5,7 +5,10 @@ let serverSocket = null;
 
 function connectToServer(onData) {
   return new Promise(resolve => {
-    serverSocket = net.connect(3000, resolve);
+    serverSocket = net.connect(3000, function () {
+        serverSocket.setNoDelay(true);
+        resolve();
+    });
 
     serverSocket.on('data', onData);
     serverSocket.on('error', () => { serverSocket = null; });

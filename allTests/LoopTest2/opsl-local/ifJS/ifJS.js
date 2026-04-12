@@ -13,7 +13,7 @@ async function ifFunc() {
 
     //console.log(number);
     var output;
-    if (Number(number) > 100000) {
+    if (Number(number) > 10000) {
         output = trueReturn;
     } else {
         output = falseReturn;
