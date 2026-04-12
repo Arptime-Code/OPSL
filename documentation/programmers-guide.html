@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPSL Programmer's Guide — Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#162032;--border:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--pink:#ec4899;--font:'Inter','Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:52px;background:rgba(10,14,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px}
+nav a{color:var(--text2);text-decoration:none;font-size:12px;font-weight:500;padding:6px 10px;border-radius:5px;transition:all 0.15s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(59,130,246,0.1)}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:280px;min-width:240px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;flex-shrink:0}
+#sidebar::-webkit-scrollbar{width:5px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#sidebar h3{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;padding:8px 16px;margin-top:8px}
+#sidebar a{display:block;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;transition:all 0.12s;border-left:2px solid transparent}
+#sidebar a:hover{color:var(--text);background:rgba(59,130,246,0.05);border-left-color:var(--accent)}
+#sidebar a.active{color:var(--accent);background:rgba(59,130,246,0.1);border-left-color:var(--accent)}
+#content{flex:1;overflow-y:auto;padding:40px 48px;max-width:900px}
+#content::-webkit-scrollbar{width:8px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+h1{font-size:32px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:600;margin:40px 0 12px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:17px;font-weight:600;margin:28px 0 8px;color:var(--accent)}
+h4{font-size:14px;font-weight:600;margin:18px 0 6px;color:var(--text)}
+p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre;color:#e6edf3}
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.note strong{color:var(--accent)}
+.note-green{background:rgba(34,197,94,0.08);border-left-color:var(--green)}.note-green strong{color:var(--green)}
+.note-orange{background:rgba(245,158,11,0.08);border-left-color:var(--orange)}.note-orange strong{color:var(--orange)}
+.note-purple{background:rgba(168,85,247,0.08);border-left-color:var(--purple)}.note-purple strong{color:var(--purple)}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:8px 12px;border:1px solid var(--border);font-size:12px}
+th{background:var(--card2);color:var(--accent);font-weight:600}
+td{color:var(--text2)}
+ul{padding-left:20px;margin:8px 0}
+li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+ol{padding-left:20px;margin:8px 0}
+ol li{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+a{text-decoration:none;color:var(--accent)}
+a:hover{text-decoration:underline}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:16px 0}
+.card h3{margin-top:0}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--accent)}
+.badge-green{background:rgba(34,197,94,0.15);color:var(--green)}
+.badge-orange{background:rgba(245,158,11,0.15);color:var(--orange)}
+.badge-purple{background:rgba(168,85,247,0.15);color:var(--purple)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ OPSL Docs</div>
+  <a href="index.html">Home</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="tcp-system.html">TCP System</a>
+  <a href="api-reference.html">API Reference</a>
+  <a href="code-walkthrough.html">Code Walkthrough</a>
+  <a href="programmers-guide.html" class="active">Programmer's Guide</a>
+</nav>
+<main>
+  <div id="sidebar">
+    <h3>Overview</h3>
+    <a href="index.html">Home</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="tcp-system.html">TCP System</a>
+    <a href="api-reference.html">API Reference</a>
+    <a href="code-walkthrough.html">Code Walkthrough</a>
+    <a href="programmers-guide.html" class="active">Programmer's Guide</a>
+    <h3>This Page</h3>
+    <a href="#what-is-opsl">What is OPSL?</a>
+    <a href="#four-instructions">The 4 Instructions</a>
+    <a href="#import-deep">IMPORT — Deep Dive</a>
+    <a href="#variable-deep">VARIABLE — Deep Dive</a>
+    <a href="#assign-deep">ASSIGN — Deep Dive</a>
+    <a href="#call-deep">CALL — Deep Dive</a>
+    <a href="#data-flow">How Data Flows</a>
+    <a href="#writing-libs">Writing Libraries</a>
+    <a href="#function-rules">Function Rules</a>
+    <a href="#variable-rules">Variable Rules</a>
+    <a href="#opsl-libs">Writing OPSL Libraries</a>
+    <a href="#patterns">Common Patterns</a>
+    <a href="#loops">Loops</a>
+    <a href="#conditionals">Conditionals</a>
+    <a href="#debugging">Debugging</a>
+    <a href="#best-practices">Best Practices</a>
+    <a href="#performance">Performance Tips</a>
+    <a href="#common-mistakes">Common Mistakes</a>
+    <a href="#full-example">Full Working Example</a>
+  </div>
+  <div id="content">
+    <h1>The OPSL Programmer's Guide</h1>
+    <p class="subtitle">Everything you need to know to write effective OPSL scripts and libraries — from the four basic instructions to advanced patterns, debugging, and best practices.</p>
+
+    <h2 id="what-is-opsl">What is OPSL?</h2>
+    <p>OPSL (One Programming/Scripting Language) is a <strong>custom scripting language</strong> designed to orchestrate code execution across multiple programming languages. Instead of writing everything in one language, you write a simple script that tells different libraries — written in JavaScript, Python, C, or even other OPSL files — what to do and when.</p>
+
+    <p>Think of OPSL as a <strong>conductor of an orchestra</strong>. The conductor doesn't play any instrument. Instead, they point to the violinist when it's time for strings, cue the drummer for percussion, and signal the flutist for melody. OPSL does exactly that — it points to libraries and tells them when to execute.</p>
+
+    <div class="note">
+      <strong>Key insight:</strong> OPSL itself has no loops, no conditionals, and no variables of its own. It's purely sequential — one instruction after another. Loops and conditionals are achieved through library logic and the <code>CALL opsl.functionCall</code> mechanism.
+    </div>
+
+    <h2 id="four-instructions">The 4 Instructions</h2>
+    <p>OPSL has exactly four instructions. That's it. Every OPSL script is just a sequence of these four commands:</p>
+
+    <table>
+      <tr><th>Instruction</th><th>Format</th><th>What it does</th></tr>
+      <tr><td><strong>IMPORT</strong></td><td><code>IMPORT [lang] name</code></td><td>Loads a library into the program</td></tr>
+      <tr><td><strong>VARIABLE</strong></td><td><code>VARIABLE lib.var = "value"</code></td><td>Stores a value in a library</td></tr>
+      <tr><td><strong>ASSIGN</strong></td><td><code>ASSIGN lib.target = source.var</code></td><td>Copies a value between libraries</td></tr>
+      <tr><td><strong>CALL</strong></td><td><code>CALL lib.functionName</code></td><td>Executes a function in a library</td></tr>
+    </table>
+
+    <p>These four instructions are the <strong>entire language</strong>. There are no keywords beyond these. There are no operators, no expressions, no control flow. Just these four commands, executed one after another from top to bottom.</p>
+
+    <h2 id="import-deep">IMPORT — Deep Dive</h2>
+
+    <h3>What it does</h3>
+    <p><code>IMPORT [lang] name</code> loads a library and makes it available for subsequent VARIABLE, ASSIGN, and CALL instructions.</p>
+
+    <h3>Syntax breakdown</h3>
+    <div class="code-block">IMPORT [js] greeting
+       ↑    ↑
+     lang  name
+
+IMPORT [opsl] helper
+       ↑       ↑
+     lang    name</div>
+
+    <h3>How OPSL finds the library file</h3>
+    <p>When you write <code>IMPORT [js] greeting</code>, OPSL searches for the file in two locations, in this order:</p>
+    <ol>
+      <li><strong>Project root:</strong> <code>projectFolder/greeting.js</code></li>
+      <li><strong>Local folder:</strong> <code>projectFolder/opsl-local/greeting/greeting.js</code></li>
+    </ol>
+    <p>If the language is <code>[opsl]</code>, it looks for <code>.opsl</code> files instead. The first match wins.</p>
+
+    <h3>What happens when IMPORT runs</h3>
+    <p>IMPORT does three things behind the scenes:</p>
+    <ol>
+      <li><strong>Locates the file</strong> on disk using the search rules above</li>
+      <li><strong>Starts the library</strong> — for JS, spawns <code>node library.js</code> as a separate process</li>
+      <li><strong>Waits for ready</strong> — the library must print <code>"loaded and registered"</code> to stdout</li>
+    </ol>
+    <p>Once all three steps complete, the library is ready to receive VARIABLE, ASSIGN, and CALL instructions.</p>
+
+    <h3>Important rules</h3>
+    <ul>
+      <li><strong>Each library is imported only once.</strong> A second IMPORT of the same name is silently ignored.</li>
+      <li><strong>Libraries must be imported before use.</strong> You can't call a function in a library that hasn't been imported yet.</li>
+      <li><strong>Import order matters.</strong> Libraries are started sequentially, so import order affects initialization timing.</li>
+    </ul>
+
+    <h2 id="variable-deep">VARIABLE — Deep Dive</h2>
+
+    <h3>What it does</h3>
+    <p><code>VARIABLE lib.var = "value"</code> stores a value in a library's namespace on the TCP server.</p>
+
+    <h3>Syntax breakdown</h3>
+    <div class="code-block">VARIABLE test.myVar = "hello world"
+         ↑    ↑         ↑
+       lib  var       value
+
+VARIABLE add.counter = "0"
+         ↑   ↑         ↑
+       lib var       value</div>
+
+    <h3>What actually happens</h3>
+    <p>When OPSL encounters this instruction:</p>
+    <ol>
+      <li>It looks up the library <code>test</code> in its registry of imported libraries</li>
+      <li>It sends a TCP message to the server: <code>id:test:set:myVar:hello world</code></li>
+      <li>The server stores: <code>clients["test"].values["myVar"] = "hello world"</code></li>
+      <li>The server responds: <code>id:ok</code></li>
+    </ol>
+    <p>The value is now stored on the TCP server, associated with the <code>test</code> library.</p>
+
+    <h3>Important rules</h3>
+    <ul>
+      <li><strong>Values are always strings.</strong> Even if you write <code>"42"</code>, it stays as the string <code>"42"</code>, not the number 42.</li>
+      <li><strong>Quotes are required.</strong> The value must be enclosed in double quotes: <code>= "value"</code></li>
+      <li><strong>Each VARIABLE overwrites.</strong> Setting the same variable twice replaces the previous value.</li>
+      <li><strong>The library itself may not know about it yet.</strong> The variable is stored on the server. The library must call <code>TCPClient.get()</code> to read it.</li>
+    </ul>
+
+    <div class="note note-orange">
+      <strong>Common confusion:</strong> VARIABLE stores a value on the TCP server. It does NOT create a local variable inside the JavaScript library. The library must explicitly read it via <code>TCPClient.get('myVar')</code>.
+    </div>
+
+    <h2 id="assign-deep">ASSIGN — Deep Dive</h2>
+
+    <h3>What it does</h3>
+    <p><code>ASSIGN target.name = source.var</code> copies a value from one library's namespace to another's.</p>
+
+    <h3>Syntax breakdown</h3>
+    <div class="code-block">ASSIGN test.result = add.output
+       ↑    ↑         ↑    ↑
+    target  target  source source
+    lib     var     lib    var
+
+ASSIGN opsl.consoleLog = ifJS.number
+       ↑       ↑          ↑     ↑
+     target   target    source source
+     lib      var       lib    var</div>
+
+    <h3>What actually happens (two TCP round-trips)</h3>
+    <ol>
+      <li><strong>GET from source:</strong> OPSL sends <code>id:add:get:output</code> → server returns <code>id:42</code></li>
+      <li><strong>SET to target:</strong> OPSL sends <code>id:test:set:result:42</code> → server stores it</li>
+    </ol>
+    <p>The value <code>"42"</code> has now been copied from <code>add.output</code> to <code>test.result</code>.</p>
+
+    <h3>Important rules</h3>
+    <ul>
+      <li><strong>Both libraries must be imported.</strong> If either library is missing, ASSIGN silently does nothing.</li>
+      <li><strong>OPSL libraries are skipped.</strong> OPSL libraries don't store variables on the TCP server, so you can't ASSIGN from or to them.</li>
+      <li><strong>The source variable must exist.</strong> If <code>add.output</code> was never set, you get an empty string <code>""</code>.</li>
+      <li><strong>This is a copy, not a reference.</strong> Changing the source after ASSIGN doesn't affect the target.</li>
+    </ul>
+
+    <h2 id="call-deep">CALL — Deep Dive</h2>
+
+    <h3>What it does</h3>
+    <p><code>CALL lib.functionName</code> executes a function. What happens next depends on the library's language.</p>
+
+    <h3>For JavaScript libraries</h3>
+    <p>The function call travels through TCP:</p>
+    <ol>
+      <li>OPSL sends <code>id:lib:call:lib:functionName</code> to the server</li>
+      <li>Server looks up the library's local server port</li>
+      <li>Server connects to the library's local server and sends <code>call:functionName</code></li>
+      <li>The library executes the function</li>
+      <li>The result travels back through the server to OPSL</li>
+    </ol>
+    <p><strong>Functions have no parameters and return nothing.</strong> They simply execute. If they need data, they read from the TCP server via <code>TCPClient.get()</code>. If they produce data, they write to the TCP server via <code>TCPClient.set()</code>.</p>
+
+    <h3>For OPSL libraries</h3>
+    <p>CALL executes a nested .opsl file:</p>
+    <ol>
+      <li>OPSL looks for <code>opsl-local/lib/functionName.opsl</code></li>
+      <li>If found, it creates a new Runtime instance</li>
+      <li>The new runtime shares all imported libraries from the parent</li>
+      <li>It processes the nested .opsl file line by line</li>
+      <li>When done, control returns to the parent script</li>
+    </ol>
+
+    <h3>Special calls</h3>
+    <p>Two OPSL library calls have special behavior:</p>
+
+    <div class="code-block">CALL opsl.functionCall
+  → Reads the "functionVar" variable from the opsl library
+  → Parses it as "library.functionName"
+  → Executes that function dynamically
+
+CALL opsl.consoleLog
+  → Reads the "consoleLog" variable from the opsl library
+  → Prints it to the console</div>
+
+    <h2 id="data-flow">How Data Flows Between Libraries</h2>
+    <p>Understanding data flow is the key to writing effective OPSL. Here's the complete picture:</p>
+
+    <div class="note note-green">
+      <strong>The TCP server is the shared memory.</strong> Libraries don't talk to each other directly. They all talk to the TCP server, which acts as a central message hub and data store.
+    </div>
+
+    <h3>The flow of a VARIABLE instruction</h3>
+    <div class="code-block">OPSL script               TCP Server            JS Library
+    |                          |                       |
+    | VARIABLE test.x = "hi"   |                       |
+    |------------------------->|                       |
+    |  id:1:test:set:x:hi      |                       |
+    |                          | stores:               |
+    |                          | test.values.x = "hi"  |
+    |<-------------------------|                       |
+    |  id:1:ok                 |                       |
+    |                          |                       |</div>
+
+    <h3>The flow of a CALL instruction</h3>
+    <div class="code-block">OPSL script               TCP Server            JS Library (port 4001)
+    |                          |                       |
+    | CALL test.sayHello       |                       |
+    |------------------------->|                       |
+    |  id:2:test:call:test:sayHello                    |
+    |                          | connects to port 4001 |
+    |                          |---------------------->|
+    |                          |  call:sayHello        |
+    |                          |                       | executes sayHello()
+    |                          |<----------------------|
+    |                          |  result               |
+    |<-------------------------|                       |
+    |  id:2:result             |                       |</div>
+
+    <h3>The flow of an ASSIGN instruction</h3>
+    <div class="code-block">OPSL script               TCP Server
+    |                          |
+    | ASSIGN test.y = add.x    |
+    |------------------------->|
+    |  id:3:add:get:x          |
+    |<-------------------------|
+    |  id:3:"42"               |
+    |------------------------->|
+    |  id:4:test:set:y:42     |
+    |<-------------------------|
+    |  id:4:ok                |</div>
+
+    <h2 id="writing-libs">Writing JavaScript Libraries</h2>
+    <p>Every JS library follows this template. This is the only pattern:</p>
+
+    <div class="code-block">// 1. Require the TCP client
+var TCPClient = require('opsl-tcp-client');
+
+// 2. Define functions — no parameters allowed
+function myFunction() {
+    // Read state from TCP server
+    var x = await TCPClient.get('myVar');
+
+    // Do work
+    console.log("Value is: " + x);
+
+    // Write state back to TCP server
+    await TCPClient.set('result', 'done');
+}
+
+// 3. Initialize — no port needed (OS assigns automatically)
+(async () => {
+    await TCPClient.init('libraryName');
+    await TCPClient.set('initialVar', 'value');
+    await TCPClient.registerFunction('myFunction', myFunction);
+    console.log("loaded and registered");
+})();</div>
+
+    <h3>Every line explained</h3>
+
+    <h4>Line 1: require</h4>
+    <p><code>var TCPClient = require('opsl-tcp-client');</code> — This is a globally installed npm package. No path needed. It gives you the 5 methods: <code>init()</code>, <code>set()</code>, <code>get()</code>, <code>registerFunction()</code>, and <code>callRemote()</code>.</p>
+
+    <h4>Lines 4-12: Functions</h4>
+    <p>Functions have <strong>no parameters and no returns</strong>. If a function needs data, it calls <code>TCPClient.get()</code>. If it produces data, it calls <code>TCPClient.set()</code>. The function body can be async — use <code>await</code> for TCP operations.</p>
+
+    <h4>Lines 15-19: Initialization</h4>
+    <p>This is an async IIFE (Immediately Invoked Function Expression). It runs when the file is loaded. The four steps are:</p>
+    <ol>
+      <li><code>TCPClient.init('name')</code> — connects to server, starts local server (port auto-assigned)</li>
+      <li><code>TCPClient.set()</code> — set initial variables (optional)</li>
+      <li><code>TCPClient.registerFunction()</code> — make functions callable from OPSL</li>
+      <li><code>console.log("loaded and registered")</code> — signals to OPSL that the library is ready</li>
+    </ol>
+
+    <h2 id="function-rules">Function Rules</h2>
+    <p>Functions in OPSL libraries follow strict rules:</p>
+
+    <table>
+      <tr><th>Rule</th><th>Explanation</th></tr>
+      <tr><td>No parameters</td><td>Functions are always called with zero arguments. <code>function greet()</code> — not <code>function greet(name)</code></td></tr>
+      <tr><td>No returns</td><td>Return values are ignored. Use <code>TCPClient.set()</code> to communicate results.</td></tr>
+      <tr><td>Can be async</td><td>Use <code>async function</code> and <code>await TCPClient.get/set</code></td></tr>
+      <tr><td>Must be registered</td><td>Only functions passed to <code>registerFunction()</code> are callable from OPSL</td></tr>
+      <tr><td>Can call other functions</td><td>Functions can call each other internally — just not from OPSL with args</td></tr>
+    </table>
+
+    <h3>Why no parameters?</h3>
+    <p>Because OPSL is designed around shared state via the TCP server. Instead of passing arguments, the caller sets variables on the server, the function reads them, does work, and writes results back. This makes the data flow explicit and traceable.</p>
+
+    <h2 id="variable-rules">Variable Rules</h2>
+
+    <h3>The two types of variables</h3>
+    <p>There are actually two places variables can live:</p>
+    <ol>
+      <li><strong>On the TCP server</strong> — set by OPSL's VARIABLE instruction or by <code>TCPClient.set()</code> inside a library</li>
+      <li><strong>Inside a library's local memory</strong> — local JS variables like <code>var counter = 0</code></li>
+    </ol>
+
+    <div class="note note-orange">
+      <strong>Critical:</strong> Local variables are <strong>not visible</strong> to other libraries or to OPSL. Only TCP server variables are shared. If you modify a local variable inside a function, other libraries will never see the change.
+    </div>
+
+    <h3>When to use TCPClient.get() inside functions</h3>
+    <p>Always use <code>TCPClient.get()</code> at the start of a function if you need the current value of a variable. The value on the server may have been changed by an ASSIGN instruction from OPSL since the function last ran.</p>
+
+    <div class="code-block">// CORRECT: Always read from server
+async function add() {
+    var number = await TCPClient.get('number');  // Latest value
+    number = String(Number(number) + 1);
+    await TCPClient.set('number', number);        // Update server
+}
+
+// WRONG: Local variables become stale
+var number = "0";  // Only initialized once when library loads
+async function add() {
+    number = String(Number(number) + 1);  // Uses stale local value!
+    await TCPClient.set('number', number);
+}</div>
+
+    <h2 id="opsl-libs">Writing OPSL Libraries</h2>
+    <p>OPSL libraries are simply .opsl files that get executed as nested scripts. They follow the same 4-instruction language.</p>
+
+    <h3>How they work</h3>
+    <p>When OPSL executes <code>CALL myHelper.doSomething</code> and <code>myHelper</code> is an OPSL library:</p>
+    <ol>
+      <li>OPSL looks for <code>opsl-local/myHelper/doSomething.opsl</code></li>
+      <li>Creates a new Runtime instance (nested)</li>
+      <li>The nested runtime shares all imported libraries from the parent</li>
+      <li>Processes the .opsl file line by line</li>
+      <li>When done, returns control to the parent</li>
+    </ol>
+
+    <h3>Why use OPSL libraries?</h3>
+    <ul>
+      <li><strong>Reusability:</strong> Extract common OPSL instruction sequences into named functions</li>
+      <li><strong>Organization:</strong> Break large scripts into smaller, manageable pieces</li>
+      <li><strong>Dynamic dispatch:</strong> The <code>CALL opsl.functionCall</code> mechanism lets you choose which OPSL function to execute at runtime</li>
+    </ul>
+
+    <h2 id="patterns">Common Patterns</h2>
+
+    <h3>Pattern 1: Set up, then execute</h3>
+    <div class="code-block">IMPORT [js] processor
+
+VARIABLE processor.mode = "fast"
+VARIABLE processor.input = "data.txt"
+
+CALL processor.run</div>
+    <p>Set configuration variables first, then call the function that reads them.</p>
+
+    <h3>Pattern 2: Chain libraries</h3>
+    <div class="code-block">IMPORT [js] reader
+IMPORT [js] transformer
+IMPORT [js] writer
+
+CALL reader.read
+ASSIGN transformer.input = reader.output
+CALL transformer.transform
+ASSIGN writer.input = transformer.output
+CALL writer.write</div>
+    <p>Data flows: reader → transformer → writer, using ASSIGN as the pipe.</p>
+
+    <h3>Pattern 3: Conditional branching via OPSL</h3>
+    <div class="code-block">IMPORT [js] checker
+IMPORT [opsl] opsLib
+
+VARIABLE checker.value = "test"
+CALL checker.check
+ASSIGN opsLib.branch = checker.result
+CALL opsLib.routeBranch</div>
+    <p>The JS library decides which branch to take, stores it, and the OPSL library reads it and routes accordingly.</p>
+
+    <h2 id="loops">Loops</h2>
+    <p>OPSL has no <code>for</code> or <code>while</code> keywords. Loops are achieved through <strong>dynamic dispatch</strong>:</p>
+
+    <h3>How the loop pattern works</h3>
+    <div class="code-block">IMPORT [js] counter
+IMPORT [js] condition
+IMPORT [opsl] loopBody
+
+VARIABLE condition.trueReturn = ""
+VARIABLE condition.falseReturn = "loopBody.repeat"
+ASSIGN condition.input = counter.value
+
+CALL condition.check
+
+ASSIGN opsl.functionVar = condition.output
+CALL opsl.functionCall</div>
+
+    <p>The pattern:</p>
+    <ol>
+      <li>A JS <strong>condition library</strong> checks if the loop should continue</li>
+      <li>If yes: it sets <code>output = "loopBody.repeat"</code></li>
+      <li>If no: it sets <code>output = ""</code> (empty = stop)</li>
+      <li><code>CALL opsl.functionCall</code> reads <code>functionVar</code> and executes the named function</li>
+      <li>If it was <code>"loopBody.repeat"</code>, the nested OPSL file runs and calls <code>opsl.functionCall</code> again</li>
+      <li>The loop repeats until condition returns empty string</li>
+    </ol>
+
+    <div class="note note-green">
+      <strong>See it in action:</strong> The LoopTest2 project demonstrates a complete counting loop that counts from 0 to 1000 using this pattern.
+    </div>
+
+    <h2 id="conditionals">Conditionals</h2>
+    <p>Conditionals are also achieved through library logic:</p>
+
+    <div class="code-block">IMPORT [js] validator
+IMPORT [opsl] handlers
+
+VARIABLE validator.input = testData
+CALL validator.validate
+ASSIGN handlers.branch = validator.output
+CALL handlers.routeBranch</div>
+
+    <p>The JS library evaluates the condition and stores which branch to take. The OPSL handler library reads that branch and executes the appropriate nested script.</p>
+
+    <h2 id="debugging">Debugging</h2>
+
+    <h3>Console output</h3>
+    <p>Every library's <code>console.log()</code> is prefixed with the library name:</p>
+    <div class="code-block">[test] test.js loaded and registered
+[add] add.js loaded and registered
+[ifJS] 0
+[ifJS] 1
+[ifJS] 2</div>
+
+    <h3>Common issues and how to fix them</h3>
+
+    <table>
+      <tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr>
+      <tr><td>Library never runs</td><td>Missing <code>console.log("loaded and registered")</code></td><td>Add the ready signal to your library's init</td></tr>
+      <tr><td>Variable is empty</td><td>Library didn't call <code>TCPClient.set()</code></td><td>Set the variable in the library before OPSL reads it</td></tr>
+      <tr><td>Function not found</td><td>Function not passed to <code>registerFunction()</code></td><td>Add <code>TCPClient.registerFunction('name', fn)</code></td></tr>
+      <tr><td>EADDRINUSE error</td><td>Port still in use from previous run</td><td>Wait a moment and retry — the runtime auto-cleans</td></tr>
+      <tr><td>OPSL file not found</td><td>Wrong path or typo in library name</td><td>Check: <code>opsl-local/libraryName/functionName.opsl</code></td></tr>
+    </table>
+
+    <h3>Enabling verbose output</h3>
+    <p>The runtime prints each instruction as it executes. To see more detail, uncomment the debug <code>console.log()</code> statements in <code>runtimeTCP/instruction-handler.js</code>.</p>
+
+    <h2 id="best-practices">Best Practices</h2>
+
+    <h3>1. Import all libraries at the top</h3>
+    <p>Don't scatter IMPORT instructions throughout your script. Import everything first, then use them.</p>
+    <div class="code-block">// GOOD
+IMPORT [js] reader
+IMPORT [js] processor
+IMPORT [js] writer
+
+VARIABLE reader.file = "data.txt"
+CALL reader.read
+...</div>
+
+    <h3>2. Name variables descriptively</h3>
+    <p>Use clear variable names that describe their purpose, not their type.</p>
+    <div class="code-block">// GOOD
+VARIABLE processor.inputFile = "data.txt"
+VARIABLE processor.outputMode = "json"
+
+// BAD
+VARIABLE processor.x = "data.txt"
+VARIABLE processor.y = "json"</div>
+
+    <h3>3. Set variables before calling functions</h3>
+    <p>Functions read from the TCP server. Make sure the data is there before calling.</p>
+    <div class="code-block">// GOOD
+VARIABLE processor.input = "hello"
+CALL processor.process
+
+// BAD — function may read stale data
+CALL processor.process
+VARIABLE processor.input = "hello"</div>
+
+    <h3>4. Use ASSIGN to chain operations</h3>
+    <p>When one library produces output that another consumes, use ASSIGN explicitly.</p>
+    <div class="code-block">CALL producer.generate
+ASSIGN consumer.input = producer.output
+CALL consumer.consume</div>
+
+    <h3>5. Keep libraries focused</h3>
+    <p>Each library should do one thing well. A library named <code>processor</code> should only process — not read files, not write output, not validate input.</p>
+
+    <h2 id="performance">Performance Tips</h2>
+
+    <h3>1. Minimize TCP round-trips</h3>
+    <p>Each VARIABLE, ASSIGN, and CALL costs one or more TCP round-trips (~0.01-0.17ms). Reduce the number of instructions in tight loops.</p>
+
+    <h3>2. Batch variable sets in libraries</h3>
+    <p>If a function needs to set multiple variables, do it in one function call rather than multiple VARIABLE instructions from OPSL.</p>
+
+    <h3>3. Prefer JS libraries over OPSL libraries for loops</h3>
+    <p>OPS libraries spawn nested runtimes, which adds file I/O overhead. For tight loops, do the iteration in JS and call OPSL only when needed.</p>
+
+    <h2 id="common-mistakes">Common Mistakes</h2>
+
+    <h3>Mistake 1: Forgetting to register functions</h3>
+    <div class="code-block">// WRONG
+function myFunc() { console.log("hi"); }
+// Never registered — CALL will fail
+
+// RIGHT
+function myFunc() { console.log("hi"); }
+await TCPClient.registerFunction('myFunc', myFunc);</div>
+
+    <h3>Mistake 2: Using local variables instead of TCP variables</h3>
+    <div class="code-block">// WRONG: counter only initialized once
+var counter = 0;
+async function increment() {
+    counter++;  // Local — nobody else sees this
+}
+
+// RIGHT: use TCP server
+async function increment() {
+    var val = await TCPClient.get('counter');
+    val = String(Number(val) + 1);
+    await TCPClient.set('counter', val);
+}</div>
+
+    <h3>Mistake 3: Calling functions before importing</h3>
+    <div class="code-block">// WRONG
+CALL greeting.sayHello     // greeting not imported yet
+IMPORT [js] greeting
+
+// RIGHT
+IMPORT [js] greeting
+CALL greeting.sayHello</div>
+
+    <h3>Mistake 4: Expecting ASSIGN to work with OPSL libraries</h3>
+    <div class="code-block">// This silently does nothing — OPSL libs don't store on TCP server
+ASSIGN opsHelper.result = add.output</div>
+
+    <h2 id="full-example">Full Working Example</h2>
+    <p>Here's a complete OPSL project that reads input, transforms it, and outputs the result:</p>
+
+    <h3>project/test.opsl</h3>
+    <div class="code-block">IMPORT [js] reader
+IMPORT [js] transformer
+IMPORT [js] writer
+
+VARIABLE reader.fileName = "input.txt"
+CALL reader.read
+
+ASSIGN transformer.input = reader.content
+VARIABLE transformer.mode = "uppercase"
+CALL transformer.transform
+
+ASSIGN writer.content = transformer.output
+CALL writer.write</div>
+
+    <h3>project/opsl-local/reader/reader.js</h3>
+    <div class="code-block">var TCPClient = require('opsl-tcp-client');
+
+async function read() {
+    var fileName = await TCPClient.get('fileName');
+    console.log('Reading: ' + fileName);
+    // Simulated — in real code, use fs.readFileSync
+    await TCPClient.set('content', 'hello world');
+}
+
+(async () => {
+    await TCPClient.init('reader');
+    await TCPClient.registerFunction('read', read);
+    console.log("loaded and registered");
+})();</div>
+
+    <h3>project/opsl-local/transformer/transformer.js</h3>
+    <div class="code-block">var TCPClient = require('opsl-tcp-client');
+
+async function transform() {
+    var input = await TCPClient.get('input');
+    var mode = await TCPClient.get('mode');
+
+    if (mode === 'uppercase') {
+        input = input.toUpperCase();
+    }
+
+    await TCPClient.set('output', input);
+}
+
+(async () => {
+    await TCPClient.init('transformer');
+    await TCPClient.registerFunction('transform', transform);
+    console.log("loaded and registered");
+})();</div>
+
+    <h3>project/opsl-local/writer/writer.js</h3>
+    <div class="code-block">var TCPClient = require('opsl-tcp-client');
+
+async function write() {
+    var content = await TCPClient.get('content');
+    console.log('Output: ' + content);
+}
+
+(async () => {
+    await TCPClient.init('writer');
+    await TCPClient.registerFunction('write', write);
+    console.log("loaded and registered");
+})();</div>
+
+    <h3>Running it</h3>
+    <div class="code-block">$ opsl project/test.opsl
+Starting fresh TCP server...
+[TCP Server] Server on 3000
+TCP server started with clean state
+Importing library: reader (js)
+[reader] loaded and registered
+Importing library: transformer (js)
+[transformer] loaded and registered
+Importing library: writer (js)
+[writer] loaded and registered
+[reader] Reading: input.txt
+[writer] Output: HELLO WORLD
+TCP server stopped
+
+OPSL execution completed successfully</div>
+
+    <div class="note note-green">
+      <strong>You now know OPSL.</strong> The four instructions, the data flow, the library patterns — that's the entire language. Everything else is just applying these concepts to solve specific problems.
+    </div>
+  </div>
+</main>
+</body>
+</html>

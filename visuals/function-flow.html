@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPSL — Function Flow Chart</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#060a12;--text:#e2e8f0;--text2:#94a3b8;--font:'Inter',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{height:48px;background:rgba(6,10,18,0.95);border-bottom:1px solid #1e293b;display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0;z-index:100}
+nav .logo{font-weight:700;font-size:14px;color:#3b82f6;margin-right:20px}
+nav a{color:#94a3b8;text-decoration:none;font-size:11px;font-weight:500;padding:5px 8px;border-radius:4px;transition:all 0.12s}
+nav a:hover,nav a.active{color:#e2e8f0;background:rgba(59,130,246,0.1)}
+#canvas-container{flex:1;position:relative;overflow:hidden;cursor:grab}
+#canvas-container:active{cursor:grabbing}
+canvas{display:block}
+#zoom-controls{position:fixed;right:12px;bottom:12px;display:flex;gap:3px;z-index:50}
+#zoom-controls button{width:28px;height:28px;border-radius:5px;border:1px solid #1e293b;background:rgba(8,12,20,0.95);color:#e2e8f0;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#zoom-controls button:hover{border-color:#3b82f6}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⬡ Function Flow</div>
+  <a href="index.html">Home</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="function-flow.html" class="active">Function Flow</a>
+  <a href="data-flow.html">Data Flow</a>
+  <a href="concepts.html">Concepts</a>
+</nav>
+<div id="canvas-container"><canvas id="canvas"></canvas></div>
+<div id="zoom-controls">
+  <button onclick="zoomIn()">+</button>
+  <button onclick="zoomOut()">−</button>
+  <button onclick="resetView()">⟳</button>
+</div>
+<script>
+// ============================
+// Functions laid out in NATURAL EXECUTION ORDER
+// x = horizontal position (just to avoid overlap)
+// y = vertical position (execution flow, top to bottom)
+// ============================
+
+var NODE_W = 170;
+var NODE_H = 34;
+var ROW_GAP = 70;
+
+function node(id, label, x, y, calls) {
+  return {id: id, label: label, x: x, y: y, calls: calls || []};
+}
+
+var FN = [];
+
+// ===== MAIN EXECUTION FLOW =====
+FN.push(node('main','main() [entry]',0,0,['processOPSLString','cleanup']));
+FN.push(node('processOPSLString','processOPSLString()',0,ROW_GAP,['parserParseLine','handleVariable','handleAssign','handleCall']));
+FN.push(node('parserParseLine','parseLine()',0,ROW_GAP*2,['parseImport','parseAssign','parseVariable','parseCall']));
+FN.push(node('parseImport','parseImport()',-200,ROW_GAP*3,['splitBy']));
+FN.push(node('parseAssign','parseAssign()',0,ROW_GAP*3,['splitBy']));
+FN.push(node('parseVariable','parseVariable()',200,ROW_GAP*3,['splitBy']));
+FN.push(node('parseCall','parseCall()',400,ROW_GAP*3,['splitBy']));
+FN.push(node('splitBy','splitBy()',200,ROW_GAP*4,[]));
+
+FN.push(node('handleVariable','handleVariable()',-300,ROW_GAP*5,['tcpSetVariable']));
+FN.push(node('handleAssign','handleAssign()',0,ROW_GAP*5,['tcpGetVariable','tcpSetVariable']));
+FN.push(node('handleCall','handleCall()',300,ROW_GAP*5,['tcpGetVariable','runtimeExecuteOPSL','instrExecuteFn']));
+
+FN.push(node('tcpGetVariable','tcpWorkers.getVariable()',-150,ROW_GAP*6,['socketSendRequest']));
+FN.push(node('tcpSetVariable','tcpWorkers.setVariable()',150,ROW_GAP*6,['socketSendRequest']));
+FN.push(node('runtimeExecuteOPSL','executeOPSLFunction()',300,ROW_GAP*6,['opslExecutorExecute']));
+FN.push(node('instrExecuteFn','instr.executeFunction()',500,ROW_GAP*6,['tcpExecuteFn']));
+FN.push(node('tcpExecuteFn','tcpWorkers.executeFunction()',500,ROW_GAP*7,['socketSendRequest']));
+FN.push(node('opslExecutorExecute','executor.executeOPSL()',300,ROW_GAP*7,['findOPSLFile','nestedProcess']));
+FN.push(node('findOPSLFile','findOPSLFile()',150,ROW_GAP*8,[]));
+FN.push(node('nestedProcess','(nested) processOPSLString()',450,ROW_GAP*8,['parserParseLine','handleVariable','handleAssign','handleCall']));
+
+// ===== SOCKET LAYER =====
+FN.push(node('socketSendRequest','socket.sendRequest()',0,ROW_GAP*9,['sendRequestInternal']));
+FN.push(node('sendRequestInternal','sendRequestInternal()',0,ROW_GAP*10,['socketGetSocket']));
+FN.push(node('socketGetSocket','socket.getSocket()',0,ROW_GAP*11,[]));
+
+// ===== LIBRARY LOADING =====
+FN.push(node('tcpCreateWorker','tcpWorkers.createWorker()',-300,ROW_GAP*12,['jsSpawnWorker','opslSpawnWorker']));
+FN.push(node('loadLibrary','loadLibrary()',-300,ROW_GAP*13,['findLibraryPath','tcpCreateWorker']));
+FN.push(node('findLibraryPath','findLibraryPath()',-500,ROW_GAP*14,[]));
+FN.push(node('jsSpawnWorker','js.spawnWorker()',-300,ROW_GAP*14,[]));
+FN.push(node('opslSpawnWorker','opsl.spawnWorker()',-100,ROW_GAP*14,[]));
+
+// ===== CLEANUP FLOW =====
+FN.push(node('cleanup','cleanup()',0,ROW_GAP*15,['closeWorker','tcpCloseAll','stopServer']));
+FN.push(node('closeWorker','closeWorker() [tcpWorkers]',0,ROW_GAP*16,['jsKillWorker','opslKillWorker']));
+FN.push(node('tcpCloseAll','closeAll() [tcpWorkers]',-200,ROW_GAP*16,['socketCloseSocket']));
+FN.push(node('stopServer','stopServer() [serverMgr]',200,ROW_GAP*16,[]));
+FN.push(node('jsKillWorker','js.killWorker()',-200,ROW_GAP*17,[]));
+FN.push(node('opslKillWorker','opsl.killWorker()',0,ROW_GAP*17,[]));
+FN.push(node('socketCloseSocket','socket.closeSocket()',-200,ROW_GAP*17,[]));
+
+// ===== TCP SERVER SIDE =====
+FN.push(node('serverIndex','server/index.js [entry]',400,ROW_GAP*19,['createParser','handleMessage']));
+FN.push(node('handleMessage','handleMessage()',400,ROW_GAP*20,['getOrCreateClient','serverRespond','handleRemoteCall']));
+FN.push(node('createParser','createParser()',250,ROW_GAP*21,[]));
+FN.push(node('getOrCreateClient','getOrCreateClient()',400,ROW_GAP*21,[]));
+FN.push(node('serverRespond','respond()',550,ROW_GAP*21,[]));
+FN.push(node('handleRemoteCall','handleRemoteCall()',400,ROW_GAP*22,['getOrCreateClient','serverRespond']));
+
+// ===== TCP CLIENT SIDE =====
+FN.push(node('clientInit','TCPClient.init()',700,ROW_GAP*19,['startLocalServer','waitForPort','clientIsConnected','connectToServer','clientSend']));
+FN.push(node('waitForPort','waitForPort()',550,ROW_GAP*20,[]));
+FN.push(node('clientIsConnected','isConnected()',700,ROW_GAP*20,[]));
+FN.push(node('connectToServer','connectToServer()',850,ROW_GAP*20,[]));
+FN.push(node('startLocalServer','startLocalServer()',1000,ROW_GAP*20,['clientHandleCall']));
+FN.push(node('clientHandleCall','handleIncomingCall()',1000,ROW_GAP*21,[]));
+FN.push(node('clientSend','protocol.send()',700,ROW_GAP*22,['registerRequest','clientSendRaw']));
+FN.push(node('clientSet','TCPClient.set()',550,ROW_GAP*22,['clientSend']));
+FN.push(node('clientGet','TCPClient.get()',850,ROW_GAP*22,['clientSend']));
+FN.push(node('clientRegFn','registerFunction()',1000,ROW_GAP*22,['clientSend']));
+FN.push(node('clientCallRemote','callRemote()',1150,ROW_GAP*22,['clientSend']));
+FN.push(node('clientSendRaw','sendRaw()',850,ROW_GAP*23,[]));
+FN.push(node('registerRequest','registerRequest()',550,ROW_GAP*23,[]));
+FN.push(node('drainResponses','drainResponses()',700,ROW_GAP*23,[]));
+FN.push(node('clientGetPort','getPort()',1150,ROW_GAP*23,[]));
+
+// ===== NATIVE LIBRARY =====
+FN.push(node('nativeCall','native.callFunction()','-400',ROW_GAP*10,['nativeParseFn','nativeCallTCP']));
+FN.push(node('nativeParseFn','parseFunctionString()','-550',ROW_GAP*11,[]));
+FN.push(node('nativeCallTCP','callTCPFunction()','-250',ROW_GAP*11,[]));
+
+// ===== OPSLPM CLI =====
+FN.push(node('opslpmSave','saveProject()',1400,ROW_GAP*19,['copyFolder']));
+FN.push(node('opslpmImport','importProject()',1400,ROW_GAP*20,['copyFolder','listProjects']));
+FN.push(node('opslpmList','listProjects()',1250,ROW_GAP*21,[]));
+FN.push(node('copyFolder','copyFolder()',1550,ROW_GAP*21,['copyFolder']));
+FN.push(node('printUsage','printUsage()',1250,ROW_GAP*22,[]));
+
+// ============================
+// RENDERING
+// ============================
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var container = document.getElementById('canvas-container');
+
+var scale = 0.7, offsetX = 0, offsetY = 0;
+var dragging = false, dragStart = {x:0,y:0};
+var hoveredNode = null;
+
+function resize() {
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
+  draw();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(canvas.width/2 + offsetX, canvas.height/2 + offsetY);
+  ctx.scale(scale, scale);
+
+  // Determine highlighted edges
+  var hlFrom = null;
+  var hlTo = null;
+  if (hoveredNode) {
+    hlFrom = hoveredNode.id;
+    if (hoveredNode.calls) {
+      hoveredNode.calls.forEach(function(t) { hlTo = t; });
+    }
+  }
+
+  // Draw arrows
+  FN.forEach(function(src) {
+    if (!src.calls) return;
+    src.calls.forEach(function(targetId) {
+      var target = FN.find(function(f){ return f.id === targetId; });
+      if (!target) return;
+
+      var isHL = hoveredNode && (hoveredNode.id === src.id || hoveredNode.id === targetId);
+
+      var sx = src.x;
+      var sy = src.y + NODE_H/2;
+      var ex = target.x;
+      var ey = target.y - NODE_H/2;
+
+      // Big visible arrows
+      ctx.strokeStyle = isHL ? '#3b82f6' : (isHL ? '#3b82f6' : '#334155');
+      if (isHL) {
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = '#3b82f6';
+        ctx.shadowBlur = 8;
+      } else {
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      }
+
+      // Curved arrow
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+
+      if (Math.abs(ex - sx) < 30 && ey > sy) {
+        // Straight down - slight curve for style
+        var midY = sy + (ey - sy) * 0.5;
+        ctx.quadraticCurveTo(sx + 15, midY, ex, ey);
+      } else if (Math.abs(ex - sx) < 60) {
+        // Nearly vertical
+        var cp1y = sy + (ey - sy) * 0.4;
+        var cp2y = sy + (ey - sy) * 0.6;
+        ctx.bezierCurveTo(sx + 20, cp1y, ex - 20, cp2y, ex, ey);
+      } else {
+        // Horizontal spread
+        var dy = ey - sy;
+        var cp1x = sx + (ex - sx) * 0.3;
+        var cp2x = ex - (ex - sx) * 0.3;
+        ctx.bezierCurveTo(cp1x, sy + dy * 0.15, cp2x, ey - dy * 0.15, ex, ey);
+      }
+      ctx.stroke();
+
+      // Big arrowhead
+      if (isHL) {
+        var angle = Math.atan2(ey - sy, ex - sx);
+        ctx.fillStyle = '#60a5fa';
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex - 14 * Math.cos(angle - 0.4), ey - 14 * Math.sin(angle - 0.4));
+        ctx.lineTo(ex - 14 * Math.cos(angle + 0.4), ey - 14 * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+    });
+  });
+
+  // Draw nodes
+  FN.forEach(function(f) {
+    var isHL = hoveredNode && hoveredNode.id === f.id;
+    var w = NODE_W;
+    var h = NODE_H;
+
+    if (isHL) {
+      ctx.shadowColor = '#3b82f6';
+      ctx.shadowBlur = 20;
+    }
+
+    // Background
+    ctx.fillStyle = isHL ? '#1e3a5f' : '#0f172a';
+    ctx.strokeStyle = isHL ? '#60a5fa' : '#334155';
+    ctx.lineWidth = isHL ? 2.5 : 1;
+    ctx.beginPath();
+    ctx.roundRect(f.x - w/2, f.y - h/2, w, h, 6);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+
+    // Label
+    ctx.fillStyle = isHL ? '#fff' : '#cbd5e1';
+    ctx.font = (isHL ? '600' : '500') + ' 10px Cascadia Code, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f.label, f.x, f.y);
+  });
+
+  ctx.restore();
+}
+
+function getNodeAt(mx, my) {
+  var wx = (mx - canvas.width/2 - offsetX) / scale;
+  var wy = (my - canvas.height/2 - offsetY) / scale;
+  for (var i = FN.length - 1; i >= 0; i--) {
+    var f = FN[i];
+    if (wx >= f.x - NODE_W/2 && wx <= f.x + NODE_W/2 && wy >= f.y - NODE_H/2 && wy <= f.y + NODE_H/2) {
+      return f;
+    }
+  }
+  return null;
+}
+
+canvas.addEventListener('mousedown', function(e) {
+  var n = getNodeAt(e.clientX, e.clientY);
+  if (n) { hoveredNode = n; draw(); }
+  else { dragging = true; dragStart = {x: e.clientX - offsetX, y: e.clientY - offsetY}; }
+});
+
+canvas.addEventListener('mousemove', function(e) {
+  if (dragging) { offsetX = e.clientX - dragStart.x; offsetY = e.clientY - dragStart.y; draw(); return; }
+  var n = getNodeAt(e.clientX, e.clientY);
+  canvas.style.cursor = n ? 'pointer' : (dragging ? 'grabbing' : 'grab');
+  if (n) hoveredNode = n;
+  draw();
+});
+
+canvas.addEventListener('mouseup', function() { dragging = false; });
+canvas.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  scale = Math.max(0.2, Math.min(3, scale * (e.deltaY > 0 ? 0.9 : 1.1)));
+  draw();
+});
+
+function zoomIn() { scale = Math.min(3, scale * 1.2); draw(); }
+function zoomOut() { scale = Math.max(0.2, scale * 0.8); draw(); }
+function resetView() { scale = 0.7; offsetX = 0; offsetY = 0; draw(); }
+
+window.addEventListener('resize', resize);
+resize();
+</script>
+</body>
+</html>
