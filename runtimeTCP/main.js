@@ -43,22 +43,13 @@ async function main() {
 }
 
 // ========================================
-// Graceful shutdown — no shell commands
+// Graceful shutdown
 // ========================================
 async function cleanup(globalLibs, serverProc) {
-    // Kill all library child processes
     for (var key in globalLibs) {
-        try {
-            tcpWorkerLib.closeWorker(globalLibs[key]);
-        } catch (e) {
-            // Process already exited
-        }
+        try { tcpWorkerLib.closeWorker(globalLibs[key]); } catch (e) { }
     }
-
-    // Close the runtime TCP socket
     tcpWorkerLib.closeAll();
-
-    // Stop the TCP server
     serverManager.stopServer(serverProc);
     console.log('TCP server stopped');
 }
@@ -68,15 +59,7 @@ async function cleanupAll(serverProc) {
     serverManager.stopServer(serverProc);
 }
 
-// Handle Ctrl+C gracefully
-process.on('SIGINT', function () {
-    cleanupAll(tcpServerProcess);
-    process.exit(0);
-});
-
-process.on('SIGTERM', function () {
-    cleanupAll(tcpServerProcess);
-    process.exit(0);
-});
+process.on('SIGINT', function () { cleanupAll(tcpServerProcess); process.exit(0); });
+process.on('SIGTERM', function () { cleanupAll(tcpServerProcess); process.exit(0); });
 
 main();

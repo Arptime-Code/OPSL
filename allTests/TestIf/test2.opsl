@@ -1,0 +1,12 @@
+IMPORT [js] ifJS
+IMPORT [opsl] opsl
+
+VARIABLE ifJS.ifNumberGreater = "5"
+VARIABLE ifJS.ifNumberSmaller = "10"
+VARIABLE ifJS.ifTrueOutput = "Greater"
+VARIABLE ifJS.ifFalseOutput = "Smaller"
+
+CALL ifJS.ifFunction
+
+ASSIGN opsl.consoleLog = ifJS.ifOutput
+CALL opsl.consoleLog

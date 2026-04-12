@@ -4,15 +4,15 @@ const net = require('net');
 let serverSocket = null;
 
 function connectToServer(onData) {
-  return new Promise(resolve => {
+  return new Promise(function (resolve) {
     serverSocket = net.connect(3000, function () {
         serverSocket.setNoDelay(true);
         resolve();
     });
 
     serverSocket.on('data', onData);
-    serverSocket.on('error', () => { serverSocket = null; });
-    serverSocket.on('end', () => { serverSocket = null; });
+    serverSocket.on('error', function () { serverSocket = null; });
+    serverSocket.on('end', function () { serverSocket = null; });
   });
 }
 

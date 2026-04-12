@@ -5,32 +5,30 @@ const { send } = require('./protocol');
 const { startLocalServer } = require('./local-server');
 
 // Shared state
-var clientName = '';
-var functions = {};
-var localServer = null;
-var assignedPort = null;
+let clientName = '';
+let functions = {};
+let localServer = null;
 
-async function init(name) {
+async function init(name, port) {
     clientName = name;
 
-    // Start local server with port 0 — OS assigns a free port automatically
-    localServer = startLocalServer(0, function (fnName) {
-        return functions[fnName];
-    });
+    // Start local server to receive function calls from other clients
+    localServer = startLocalServer(port, fnName => functions[fnName]);
 
-    // Wait for the server to be listening and get the assigned port
-    assignedPort = await waitForPort(localServer);
+    // Wait for the server to get a port (supports auto-assignment with port 0)
+    let actualPort = port || 0;
+    if (actualPort === 0) {
+        actualPort = await waitForPort(localServer);
+    }
 
     // Connect to main server if needed
     if (!isConnected()) {
         await connectToServer(drainResponses);
     }
 
-    // Register with the main server using the auto-assigned port
-    return send(name, 'init', String(assignedPort));
+    return send(name, 'init', String(actualPort));
 }
 
-// Helper: wait for the local server to get an assigned port
 function waitForPort(server) {
     return new Promise(function (resolve) {
         function check() {
@@ -58,15 +56,9 @@ function registerFunction(name, fn) {
     return send(clientName, 'reg', name);
 }
 
-// No parameters — just call the function by name
-function callRemote(target, fnName) {
-    var callData = fnName;
+function callRemote(target, fn, ...args) {
+    const callData = fn + ':' + args.join(',');
     return send(clientName, 'call', target, callData);
 }
 
-// Expose assigned port for debugging
-function getPort() {
-    return assignedPort;
-}
-
-module.exports = { init: init, set: set, get: get, registerFunction: registerFunction, callRemote: callRemote, getPort: getPort };
+module.exports = { init, set, get, registerFunction, callRemote };

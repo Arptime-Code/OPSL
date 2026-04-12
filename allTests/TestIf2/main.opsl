@@ -1,0 +1,16 @@
+IMPORT [js] IfJS
+IMPORT [opsl] opsl
+
+// Set test values directly in the ifJS bucket
+VARIABLE IfJS.ifNumberGreater = "15"
+VARIABLE IfJS.ifNumberSmaller = "10"
+
+VARIABLE IfJS.ifTrueOutput = "Greater"
+VARIABLE IfJS.ifFalseOutput = "Smaller"
+
+// CALL must match case exactly
+CALL IfJS.ifFunction
+
+// Read result back from ifJS bucket and print it
+ASSIGN opsl.consoleLog = IfJS.ifOutput
+CALL opsl.consoleLog
