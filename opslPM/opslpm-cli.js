@@ -83,11 +83,44 @@ function importProject(name) {
         fs.mkdirSync(localDir, { recursive: true });
     }
 
-    // Copy the folder into opsl-local
+    // Copy the project folder into opsl-local
     var destDir = path.join(localDir, name);
     console.log('Importing "' + name + '" into opsl-local/');
     copyFolder(sourceDir, destDir);
+
+    // Check if the imported project has its own nested opsl-local folder
+    var nestedLocal = path.join(destDir, 'opsl-local');
+    if (fs.existsSync(nestedLocal) && fs.statSync(nestedLocal).isDirectory()) {
+        console.log('Found nested opsl-local/ — extracting libraries...');
+        extractNestedLibs(nestedLocal, localDir);
+        // Remove the now-empty nested folder
+        fs.rmSync(nestedLocal, { recursive: true, force: true });
+        console.log('Cleaned up nested opsl-local/');
+    }
+
     console.log('Done!');
+}
+
+// ========================================
+// Extract libraries from a nested opsl-local into the target opsl-local
+// Skips folders that already exist (no duplicates)
+// ========================================
+function extractNestedLibs(nestedLocal, targetLocal) {
+    var items = fs.readdirSync(nestedLocal);
+    items.forEach(function (item) {
+        var srcPath = path.join(nestedLocal, item);
+        var destPath = path.join(targetLocal, item);
+
+        if (fs.statSync(srcPath).isDirectory()) {
+            if (fs.existsSync(destPath)) {
+                console.log('  Skipping "' + item + '" — already exists');
+            } else {
+                // Move the folder up one level
+                copyFolder(srcPath, destPath);
+                console.log('  Extracted "' + item + '" into opsl-local/');
+            }
+        }
+    });
 }
 
 // ========================================
