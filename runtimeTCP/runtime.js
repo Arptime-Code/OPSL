@@ -54,10 +54,8 @@ Runtime.prototype.processOPSLString = async function (fileString) {
                 if (self.importedLibraries[instruction.library] && self.importedLibraries[instruction.libraryValue]) {
                     var src = globalLibraries[instruction.libraryValue];
                     var tgt = globalLibraries[instruction.library];
-                    if (src.originalLang !== 'opsl') {
-                        var val = await instructionHandler.getVariable(src, instruction.variableValue);
-                        await instructionHandler.setVariable(tgt, instruction.name, val);
-                    }
+                    var val = await instructionHandler.getVariable(src, instruction.variableValue);
+                    await instructionHandler.setVariable(tgt, instruction.name, val);
                 }
                 break;
 
