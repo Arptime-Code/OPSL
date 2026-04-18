@@ -25,11 +25,9 @@ function findLibraryPath(baseFilePath, libraryName, language) {
     if (!ext) return null;
 
     // Check if library file is in project root
-    if (libraryName === projectFolder) {
-        var rootPath = path.join(baseDir, libraryName + ext);
-        if (fs.existsSync(rootPath)) {
-            return rootPath;
-        }
+    var rootPath = path.join(baseDir, libraryName + ext);
+    if (fs.existsSync(rootPath)) {
+        return rootPath;
     }
 
     // Check in opsl-local folder

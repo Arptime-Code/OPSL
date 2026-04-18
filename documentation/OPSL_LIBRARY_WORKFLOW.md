@@ -150,21 +150,15 @@ target-project/
 
 **In project root (for OPSL libraries only):**
 ```
-target-project/
+somelib/
 ├── main.opsl
-├── somelib.opsl            <- OPSL library (ONLY works if folder name is "somelib")
+├── somelib.opsl              <- Found in project root
 └── opsl-local/
     └── mylib/
         └── mylib.opsl
 ```
 
-The root location only works if:
-- The library is an **OPSL** file (not JS)
-- The **file name** (without extension) matches the **project folder name**
-  - Example: folder "somelib" can have "somelib.opsl" in root
-  - Example: folder "mylib" cannot have "somelib.opsl" in root
-
-JS libraries cannot go in root - they must always be in `opsl-local/libraryname/libraryname.js`.
+The root location only works for **OPSL** files (not JS). No folder name requirement - works for any library name.
 
 To set up your target project:
 1. Navigate to your target project

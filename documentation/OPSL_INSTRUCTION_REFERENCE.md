@@ -31,11 +31,12 @@ IMPORT [opsl] mylib
 **2. In project root (only works for OPSL libraries):**
 
 ```
-project/                       <- Folder name must match file name
+somelib/
 ├── main.opsl
-├── somelib.opsl              <- File "somelib.opsl" in root
-└── mylib/
-    └── opsl-local/
+├── somelib.opsl              <- Found in project root
+└── opsl-local/
+    └── mylib/
+        └── mylib.opsl
 ```
 
 Usage:
@@ -45,9 +46,7 @@ IMPORT [opsl] somelib         <- Finds "somelib.opsl" in project root
 
 **Rules for project root:**
 - The library must be an **OPSL file** (not JS)
-- The **file name** (without extension) must match the **project folder name**
-- Example: folder "somelib" can have "somelib.opsl" in root
-- Example: folder "mylib" cannot have "somelib.opsl" in root
+- Works for **any** library name - no folder name requirement
 
 ---
 
