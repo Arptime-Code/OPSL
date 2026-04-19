@@ -33,11 +33,9 @@ function findOPSLFile(runtime, library, name) {
     var projectFolder = path.basename(baseDir);
 
     // Check project root
-    if (library === projectFolder) {
-        var rootPath = path.join(baseDir, name + '.opsl');
-        if (fs.existsSync(rootPath)) {
-            return rootPath;
-        }
+    var rootPath = path.join(baseDir, name + '.opsl');
+    if (fs.existsSync(rootPath)) {
+        return rootPath;
     }
 
     // Check opsl-local
